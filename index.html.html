@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCCB Credit — Specialist Certification Portal</title>
+<style>
+  :root{
+    --orange:#E8720C;
+    --orange-dark:#C25A00;
+    --navy:#12233B;
+    --navy2:#1B3358;
+    --grey:#5B6472;
+    --ltgrey:#F4F5F7;
+    --border:#E1E4E9;
+    --green:#1E8E4F;
+    --red:#D0342C;
+    --white:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Verdana,Arial,sans-serif; background:var(--ltgrey); color:var(--navy);
+    min-height:100vh;
+  }
+  header.topbar{
+    background:var(--navy); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between;
+    box-shadow:0 2px 6px rgba(0,0,0,.15);
+  }
+  header.topbar .brand{display:flex; align-items:center; gap:10px; font-weight:bold; font-size:18px;}
+  header.topbar .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--orange);}
+  header.topbar .who{font-size:13px; display:flex; align-items:center; gap:14px;}
+  header.topbar button{
+    background:var(--orange); color:#fff; border:none; padding:8px 14px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:12px;
+  }
+  header.topbar button:hover{background:var(--orange-dark);}
+  .wrap{max-width:1100px; margin:0 auto; padding:26px 18px 60px;}
+  .card{background:#fff; border:1px solid var(--border); border-radius:8px; padding:22px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .card h2{margin-top:0; color:var(--navy); border-bottom:3px solid var(--orange); padding-bottom:8px; font-size:19px;}
+  .card h3{color:var(--navy2); font-size:15px;}
+  a{color:var(--orange-dark);}
+  /* ---------- login ---------- */
+  #loginScreen{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column;
+    background:linear-gradient(135deg,var(--navy) 0%, var(--navy2) 60%, var(--orange-dark) 130%);
+  }
+  .loginBox{
+    background:#fff; width:100%; max-width:380px; border-radius:10px; padding:34px 30px; box-shadow:0 10px 40px rgba(0,0,0,.35);
+  }
+  .loginBox .dot{width:14px;height:14px;border-radius:50%;background:var(--orange); display:inline-block; margin-right:8px;}
+  .loginBox h1{font-size:19px; margin:0 0 4px; color:var(--navy);}
+  .loginBox p.sub{color:var(--grey); font-size:12.5px; margin:0 0 22px;}
+  .loginBox label{display:block; font-size:12px; font-weight:bold; color:var(--navy2); margin:14px 0 5px;}
+  .loginBox input, .loginBox select{
+    width:100%; padding:10px 11px; border:1px solid var(--border); border-radius:5px; font-size:14px; font-family:inherit;
+  }
+  .loginBox button.go{
+    width:100%; margin-top:20px; background:var(--orange); color:#fff; border:none; padding:12px; border-radius:6px;
+    font-weight:bold; font-size:14px; cursor:pointer;
+  }
+  .loginBox button.go:hover{background:var(--orange-dark);}
+  .loginErr{color:var(--red); font-size:12.5px; margin-top:10px; display:none; font-weight:bold;}
+  .loginBox .foot{text-align:center; font-size:11px; color:#9aa1ab; margin-top:18px;}
+  /* ---------- dashboard tiles ---------- */
+  .examGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;}
+  .examTile{
+    border:1px solid var(--border); border-radius:8px; padding:18px; background:#fbfbfc; position:relative;
+    border-top:4px solid var(--orange);
+  }
+  .examTile h3{margin:0 0 6px;}
+  .examTile p{font-size:12.5px; color:var(--grey); margin:4px 0 14px;}
+  .badge{display:inline-block; font-size:11px; font-weight:bold; padding:3px 9px; border-radius:20px; margin-bottom:6px;}
+  .badge.pass{background:#E4F5EA; color:var(--green);}
+  .badge.fail{background:#FBE9E7; color:var(--red);}
+  .badge.none{background:#EDEFF2; color:var(--grey);}
+  .btn{
+    display:inline-block; background:var(--navy); color:#fff; border:none; padding:9px 16px; border-radius:5px;
+    font-size:12.5px; font-weight:bold; cursor:pointer; text-decoration:none;
+  }
+  .btn:hover{background:var(--navy2);}
+  .btn.orange{background:var(--orange);}
+  .btn.orange:hover{background:var(--orange-dark);}
+  .btn.small{padding:6px 11px; font-size:11.5px;}
+  .btn[disabled]{opacity:.45; cursor:not-allowed;}
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  table th{background:var(--navy); color:#fff; text-align:left; padding:9px 10px;}
+  table td{padding:8px 10px; border-bottom:1px solid var(--border);}
+  table tr:nth-child(even) td{background:#FAFAFB;}
+  /* ---------- exam runner ---------- */
+  .examHeaderBar{
+    position:sticky; top:0; background:#fff; border-bottom:2px solid var(--orange); padding:12px 18px;
+    display:flex; justify-content:space-between; align-items:center; z-index:5; margin:-22px -22px 20px;
+  }
+  .progressOuter{background:var(--border); border-radius:10px; height:8px; width:220px; overflow:hidden;}
+  .progressInner{background:var(--orange); height:100%; width:0%; transition:width .2s;}
+  .qBlock{border-bottom:1px solid var(--border); padding:16px 0;}
+  .qBlock:last-child{border-bottom:none;}
+  .qNum{color:var(--orange-dark); font-weight:bold; font-size:12px;}
+  .qText{font-weight:bold; margin:4px 0 10px; font-size:14px;}
+  .optRow{display:block; padding:8px 10px; border:1px solid var(--border); border-radius:5px; margin-bottom:7px; cursor:pointer; font-size:13px;}
+  .optRow:hover{background:#FFF4EA;}
+  .optRow input{margin-right:8px;}
+  .optRow.selected{border-color:var(--orange); background:#FFF4EA;}
+  /* ---------- results ---------- */
+  .scoreCircle{
+    width:150px; height:150px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; margin:0 auto 16px; border:10px solid var(--border);
+  }
+  .scoreCircle.pass{border-color:var(--green);}
+  .scoreCircle.fail{border-color:var(--red);}
+  .scoreCircle .pct{font-size:32px; font-weight:bold; color:var(--navy);}
+  .scoreCircle .lbl{font-size:11px; color:var(--grey);}
+  /* ---------- certificate ---------- */
+  #certCanvasWrap{display:flex; justify-content:center; margin:14px 0;}
+  canvas#certCanvas{max-width:100%; border:1px solid var(--border); box-shadow:0 2px 10px rgba(0,0,0,.1);}
+  /* misc */
+  .row{display:flex; gap:14px; flex-wrap:wrap; align-items:center;}
+  .msg{padding:10px 14px; border-radius:6px; font-size:12.5px; margin-bottom:14px;}
+  .msg.info{background:#EAF1FB; color:var(--navy2);}
+  .msg.warn{background:#FFF4E5; color:#8A5300;}
+  .hidden{display:none !important;}
+  .navTabs{display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap;}
+  .navTabs button{
+    background:#fff; border:1px solid var(--border); padding:9px 15px; border-radius:6px 6px 0 0; cursor:pointer; font-size:12.5px; font-weight:bold; color:var(--grey);
+  }
+  .navTabs button.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+  .filterRow{display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+  .filterRow select, .filterRow input{padding:7px 10px; border:1px solid var(--border); border-radius:5px; font-size:12.5px;}
+  .statTiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:18px;}
+  .statTile{background:#fff; border:1px solid var(--border); border-left:4px solid var(--orange); border-radius:6px; padding:12px 14px;}
+  .statTile .n{font-size:22px; font-weight:bold; color:var(--navy);}
+  .statTile .l{font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:.3px;}
+  footer.foot{text-align:center; font-size:11px; color:#9aa1ab; padding:20px 0;}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ LOGIN ============================================================ -->
+<div id="loginScreen">
+  <div class="loginBox">
+    <h1><span class="dot"></span>NCCB Specialist Certification Portal</h1>
+    <p class="sub">Sign in with your NCCB Credit employee username and PIN.</p>
+    <label>Username</label>
+    <input id="loginUser" type="text" placeholder="e.g. Jessenia.L1" autocomplete="off">
+    <label>PIN</label>
+    <input id="loginPin" type="password" placeholder="4-digit PIN" maxlength="6" autocomplete="off">
+    <button class="go" onclick="doLogin()">Sign In</button>
+    <div class="loginErr" id="loginErr">Invalid username or PIN.</div>
+    <div class="foot">NCCB Credit &middot; Internal use only</div>
+  </div>
+</div>
+
+<!-- ============================================================ APP ============================================================ -->
+<div id="appScreen" class="hidden">
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span>NCCB Specialist Certification Portal</div>
+    <div class="who">
+      <span id="whoLabel"></span>
+      <button onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="syncMsg"></div>
+
+    <div class="navTabs" id="navTabs"></div>
+
+    <!-- ---------- DASHBOARD VIEW ---------- -->
+    <div id="view-dashboard">
+      <div class="card">
+        <h2>Your Certification Exams</h2>
+        <div class="examGrid" id="examGrid"></div>
+      </div>
+      <div class="card" id="myHistoryCard">
+        <h2>My Attempt History</h2>
+        <table id="myHistoryTable">
+          <thead><tr><th>Exam</th><th>Attempt</th><th>Score</th><th>Result</th><th>Date</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div id="myHistoryEmpty" class="msg info hidden">No attempts recorded yet. Choose an exam above to begin.</div>
+      </div>
+    </div>
+
+    <!-- ---------- EXAM VIEW ---------- -->
+    <div id="view-exam" class="hidden">
+      <div class="card" style="padding-top:0;">
+        <div class="examHeaderBar">
+          <div>
+            <strong id="examTitle">Exam</strong><br>
+            <span style="font-size:11.5px;color:var(--grey);" id="examSub">90 questions &middot; 80% required to pass</span>
+          </div>
+          <div class="row">
+            <div class="progressOuter"><div class="progressInner" id="examProgress"></div></div>
+            <span id="examProgressLbl" style="font-size:12px;color:var(--grey);">0 / 90 answered</span>
+          </div>
+        </div>
+        <div id="examQuestions"></div>
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn orange" onclick="submitExam()" style="padding:12px 30px; font-size:14px;">Submit Exam</button>
+          <div id="examWarn" class="msg warn hidden" style="max-width:400px;margin:14px auto 0;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- RESULTS VIEW ---------- -->
+    <div id="view-results" class="hidden">
+      <div class="card" style="text-align:center;">
+        <h2 style="border:none; text-align:left;" id="resultsTitle">Exam Results</h2>
+        <div class="scoreCircle" id="scoreCircle">
+          <div class="pct" id="scorePct">0%</div>
+          <div class="lbl" id="scoreLbl">SCORE</div>
+        </div>
+        <h3 id="resultVerdict"></h3>
+        <p id="resultDetail" style="color:var(--grey); font-size:13px;"></p>
+        <div class="row" style="justify-content:center;">
+          <button class="btn" onclick="showView('dashboard')">Back to Dashboard</button>
+          <button class="btn orange hidden" id="viewCertBtn" onclick="openCertificate()">View / Download Certificate</button>
+          <button class="btn hidden" id="retakeBtn" onclick="retakeExam()">Retake Exam</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- CERTIFICATE VIEW ---------- -->
+    <div id="view-cert" class="hidden">
+      <div class="card">
+        <h2>Certificate of Completion</h2>
+        <div id="certCanvasWrap"><canvas id="certCanvas" width="1400" height="990"></canvas></div>
+        <div class="row" style="justify-content:center;">
+          <button class="btn orange" onclick="downloadCert()">Download Certificate (PNG)</button>
+          <button class="btn" onclick="showView('dashboard')">Back to Dashboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- ADMIN VIEW ---------- -->
+    <div id="view-admin" class="hidden">
+      <div class="card">
+        <h2>Administrator Results Dashboard</h2>
+        <div class="statTiles" id="adminStats"></div>
+        <div class="filterRow">
+          <select id="fltExam"><option value="">All Exams</option><option value="dms">Debt Management Specialist</option><option value="ccs">Credit Counselor Specialist</option></select>
+          <select id="fltStatus"><option value="">All Statuses</option><option value="pass">Certified (Pass)</option><option value="fail">Not Yet Certified</option><option value="none">No Attempt</option></select>
+          <input id="fltName" type="text" placeholder="Search employee...">
+          <button class="btn small" onclick="renderAdmin()">Apply Filters</button>
+          <button class="btn small orange" onclick="refreshAdminData()">Refresh Data</button>
+        </div>
+        <table>
+          <thead><tr><th>Employee</th><th>Username</th><th>Exam</th><th>Best Score</th><th>Attempts</th><th>Status</th><th>Last Completed</th></tr></thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+        <div id="adminEmpty" class="msg info hidden">No attempt data yet, or backend not configured — see setup note in Code.gs.</div>
+      </div>
+      <div class="card">
+        <h2>Full Attempt Log</h2>
+        <table>
+          <thead><tr><th>#</th><th>Employee</th><th>Exam</th><th>Score</th><th>Result</th><th>Timestamp</th></tr></thead>
+          <tbody id="adminLogBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <footer class="foot">NCCB Credit &middot; Specialist Certification Portal &middot; internal training use only</footer>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — the only thing you need to edit.
+   Paste your deployed Google Apps Script Web App URL below once
+   you've set up Code.gs (see SETUP.md). Leave as-is to run in
+   local/offline demo mode (data will not sync across devices).
+   ============================================================ */
+const CONFIG = {
+  WEBAPP_URL: 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'
+};
+
+/* ============================================================
+   EMPLOYEES — from README credential table.
+   role: 'admin' sees Administrator dashboard + both exams.
+         'dms' sees only the Debt Management Specialist exam.
+         'ccs' sees only the Credit Counselor Specialist exam.
+   ============================================================ */
+const EMPLOYEES = [
+  { username:'Shaquile.H1',  pin:'4827', name:'Shaquile',  access:['dms'] },
+  { username:'Rogelio.L1',   pin:'6153', name:'Rogelio',   access:['ccs'] },
+  { username:'Jessenia.L1',  pin:'2948', name:'Jessenia',  access:['dms','ccs'], admin:true },
+  { username:'Alexia.R1',    pin:'7316', name:'Alexia',    access:['dms','ccs'], admin:true },
+  { username:'Lawrence.H1',  pin:'8562', name:'Lawrence',  access:['dms','ccs'], admin:true },
+];
+
+const EXAMS = {
+  dms: { key:'dms', label:'Debt Management Specialist', short:'DMS', desc:'Covers OCCC compliance, the NCCB fee schedule, DMP vs. Debt Settlement, FDCPA/TCPA, and required documentation standards.' },
+  ccs: { key:'ccs', label:'Credit Counselor Specialist', short:'CCS', desc:'Covers FCRA, credit scoring factors, credit restoration workflow, My800Scores, and compliant client counseling practices.' }
+};
+
+const QUESTIONS = {"dms":[{"q":"NCCB Credit is licensed in Texas under which regulatory framework?","opts":["Texas OCCC Chapter 394 (Debt Management Organizations)","Texas Finance Code Chapter 342 (Consumer Loans)","Texas Insurance Code Chapter 4001","Texas Business Organizations Code Chapter 21"],"a":0,"exp":"NCCB Credit is a Texas OCCC Chapter 394 licensed debt management organization."},{"q":"What is the correct order in which NCCB fees must be disclosed and sequenced with a new Debt Management client?","opts":["My800Scores $39.99/mo, then Credit Counseling $175.95, then Debt Management $559 retainer + 10%","Debt Management retainer first, then My800Scores, then Credit Counseling","All fees are disclosed and charged simultaneously at enrollment","Credit Counseling fee only; My800Scores and Debt Management fees are optional add-ons"],"a":0,"exp":"Current Service Advisory & Program Placement Guide v2 sequence: My800Scores $39.99/mo -> Credit Counseling $175.95 (no retainer) -> Debt Management $559 retainer + 10%."},{"q":"What is the current Debt Management program fee structure?","opts":["$559 retainer plus 10%","$140.95 flat fee only","$559 retainer plus 18%","No retainer, 15% of enrolled debt"],"a":0,"exp":""},{"q":"What is the current Debt Settlement program fee structure?","opts":["$559 retainer plus 18%","$559 retainer plus 10%","$175.95 flat, no retainer","$39.99/month only"],"a":0,"exp":""},{"q":"A prospect has $4,200 in unsecured debt and is asking about Debt Management enrollment. What should the specialist do?","opts":["Follow the program's minimum-debt gate and route the prospect to the appropriate alternative track if below threshold","Enroll them regardless of the amount since they asked","Tell them to call back when they have more debt","Automatically place them into Debt Settlement instead without disclosure"],"a":0,"exp":"NCCB intake logic applies a minimum-debt gate; prospects below the threshold are rerouted to an appropriate track (e.g., Credit Restoration or Financial Counseling) rather than force-enrolled."},{"q":"Which federal law primarily governs third-party debt collector conduct (harassment, false statements, unfair practices)?","opts":["Fair Debt Collection Practices Act (FDCPA)","Truth in Lending Act (TILA)","Fair Credit Reporting Act (FCRA)","Gramm-Leach-Bliley Act (GLBA)"],"a":0,"exp":""},{"q":"Which federal law governs unsolicited telemarketing calls, robocalls, and prior express written consent requirements?","opts":["Telephone Consumer Protection Act (TCPA)","CAN-SPAM Act","Dodd-Frank Act","RESPA"],"a":0,"exp":""},{"q":"On the NCCB intake form, why is a TCPA-compliant SMS opt-in required before texting a prospect?","opts":["Written/electronic consent is required before sending automated or marketing text messages under the TCPA","It is only a courtesy, not a legal requirement","It applies only to phone calls, not text messages","It is required by the OCCC, not the TCPA"],"a":0,"exp":""},{"q":"What does 'DMP' stand for in the debt management context?","opts":["Debt Management Plan","Direct Merchant Payment","Debt Mitigation Program","Delinquency Monitoring Process"],"a":0,"exp":""},{"q":"In a Debt Management Plan, who typically distributes the client's monthly payment to enrolled creditors?","opts":["The debt management organization (NCCB), via a trust/servicing account","The client pays each creditor directly","The creditor's collection agency","A third-party payroll processor"],"a":0,"exp":""},{"q":"What is a primary goal of a Debt Management Plan compared to Debt Settlement?","opts":["Paying creditors in full over time, often with reduced interest rates negotiated with creditors","Paying creditors a fraction of the balance and settling for less than owed","Discharging all debt through bankruptcy","Consolidating debt into a new secured loan"],"a":0,"exp":"DMPs generally aim to repay the full principal (often at reduced interest) versus Debt Settlement which negotiates a reduced payoff amount."},{"q":"What is a primary goal of Debt Settlement compared to a Debt Management Plan?","opts":["Negotiating a lump-sum or reduced payoff for less than the full balance owed","Paying every creditor 100% of the balance with no interest reduction","Automatically improving the client's credit score within 30 days","Consolidating all debts into one new unsecured loan"],"a":0,"exp":""},{"q":"A client on a Debt Management Plan asks why their credit score dipped after enrollment even though they are current. What is the most accurate explanation?","opts":["Accounts may be re-aged or noted as enrolled in a DMP, and utilization/account mix can shift scoring factors temporarily","DMP enrollment always improves credit score immediately","The credit bureaus penalize DMP clients permanently with no recovery possible","This should never happen and indicates a data error"],"a":0,"exp":""},{"q":"What should a Debt Management Specialist do if a client mentions they are considering filing for bankruptcy?","opts":["Refer per the Service Advisory Guide's BK Counseling referral protocol","Discourage bankruptcy and insist they stay enrolled regardless of their situation","Ignore the comment since it is outside the specialist's role","Immediately cancel the client's file without discussion"],"a":0,"exp":""},{"q":"Under NCCB's compliance standards, what must a specialist do before enrolling a client in any paid program?","opts":["Disclose all applicable fees in the correct sequence and confirm the client's understanding","Collect payment first, then explain fees afterward","Only disclose fees if the client specifically asks","Disclose fees verbally only, with no documentation required"],"a":0,"exp":""},{"q":"What is the purpose of documenting a call outcome status (e.g., N/A for No Answer) in the CRM?","opts":["To maintain accurate, auditable records of every contact attempt for compliance and follow-up","It is optional and only used for internal team competitions","To track specialist call volume for punitive purposes only","It has no compliance relevance"],"a":0,"exp":""},{"q":"What does the abbreviation 'N/VM' mean in NCCB shorthand call notes?","opts":["No Voicemail Left","New Voicemail","Not Verified/Missing","Number Verification Missed"],"a":0,"exp":""},{"q":"A client disputes a fee they were charged and says it was never disclosed. What is the correct first step?","opts":["Pull the documented disclosure record/call notes and escalate per the SOP escalation contacts if unresolved","Immediately refund the fee without reviewing any documentation","Tell the client the fee cannot be disputed under any circumstance","Ignore the dispute since verbal disclosures are not documented"],"a":0,"exp":""},{"q":"Per the NCCB Daily Workflow SOP, how long is the standard lunch block?","opts":["30 minutes","60 minutes","90 minutes","45 minutes"],"a":0,"exp":""},{"q":"Who is the issuing/escalation authority named in the NCCB Daily Workflow & Sales Floor Operations SOP?","opts":["Executive Management (Dickson Ewemade)","The individual specialist's direct peer","No named authority exists","The client's original referral source"],"a":0,"exp":""},{"q":"Which of the following is an unfair, deceptive, or abusive practice a specialist must avoid under UDAAP principles?","opts":["Misrepresenting the likely results or timeline of a debt program","Accurately disclosing all program fees","Documenting a client's stated goals","Confirming a client's contact information"],"a":0,"exp":""},{"q":"What is 'reaging' of a debt account, and why does it matter to a Debt Management Specialist?","opts":["Illegally resetting the statute of limitations or delinquency clock on old debt, which specialists must never facilitate or misrepresent","A standard, encouraged practice to help clients look more current on paper","A synonym for debt settlement","A required step in every DMP enrollment"],"a":0,"exp":""},{"q":"A prospect asks, 'Is my payment history reported to the credit bureaus while on a DMP?' What is the most accurate answer?","opts":["Yes, creditors generally continue reporting payment activity, which can positively reflect consistent on-time payments over time","No, DMP payments are never reported under any circumstances","Only if the client pays in cash","Reporting stops entirely the day of enrollment"],"a":0,"exp":""},{"q":"What should a specialist do if a client becomes upset and requests to speak with a supervisor?","opts":["Follow the SOP escalation process and connect the client appropriately","Refuse the request and continue the call as normal","Hang up the call","Tell the client no supervisor is available under any circumstance"],"a":0,"exp":""},{"q":"Which of these is considered a compliance-relevant CRM/documentation standard at NCCB?","opts":["Every contact attempt, including a zero-activity day, must be logged as a complete submission","Only successful sales need to be logged","Notes are optional if the specialist remembers the call","Documentation standards apply only to management, not specialists"],"a":0,"exp":""},{"q":"What does 'ECOA' stand for, and why is it relevant to debt program communications?","opts":["Equal Credit Opportunity Act \u2014 prohibits discrimination in credit-related communications and decisions","Electronic Consumer Outreach Act \u2014 governs email marketing only","Enrollment Certification and Oversight Act \u2014 an internal NCCB policy","Estimated Cost of Account \u2014 a fee disclosure term"],"a":0,"exp":""},{"q":"A client's creditor refuses to accept reduced interest concessions through the DMP. What is an appropriate next step?","opts":["Document the refusal, inform the client transparently, and continue servicing the plan per policy","Tell the client the entire DMP has failed and cancel immediately","Hide the refusal from the client","Guarantee the client the creditor will eventually agree"],"a":0,"exp":""},{"q":"What is the purpose of the 'no-commitment' disclosure often included in loan/program submission documents?","opts":["To clarify that submitting an application or inquiry does not guarantee approval or enrollment","To waive the client's right to cancel","To commit the client to a binding contract immediately","It has no legal purpose and is boilerplate only"],"a":0,"exp":""},{"q":"Which of the following best describes 'AML/BSA' compliance relevance in a debt/finance intake context?","opts":["Anti-Money Laundering / Bank Secrecy Act considerations around verifying client identity and monitoring for suspicious financial activity","A marketing acronym with no compliance meaning","A tax filing requirement only","A credit scoring model"],"a":0,"exp":""},{"q":"A specialist is unsure whether a client qualifies for Debt Management versus Credit Restoration. What is the correct resource to consult?","opts":["The Service Advisory & Program Placement Guide","Personal judgment only, without documentation","The client's social media profile","None \u2014 placement decisions are made by clients only"],"a":0,"exp":""},{"q":"What is the primary difference between a 'live transfer' lead and an emailed lead for a Debt Management Specialist?","opts":["A live transfer connects the specialist to the prospect in real time; an emailed lead requires outbound follow-up","There is no difference in handling","Live transfers never require documentation","Emailed leads are always higher priority"],"a":0,"exp":""},{"q":"Why is it important to confirm a client's total enrolled debt amount before quoting a projected program timeline?","opts":["Program length and payment estimates are directly tied to accurate debt and budget figures","Timelines are fixed regardless of debt amount","Debt amount has no bearing on projected timelines","Only the number of creditors matters, not the balance"],"a":0,"exp":""},{"q":"What should happen if a client's financial situation changes significantly mid-program (e.g., job loss)?","opts":["The specialist should document the change and follow escalation/adjustment protocol","Nothing \u2014 the program terms can never be revisited","The client should be immediately removed from the program with no discussion","The specialist should ignore it unless the client brings it up three times"],"a":0,"exp":""},{"q":"Which best describes the specialist's role regarding legal advice to clients?","opts":["Specialists should not provide legal advice and should refer legal questions appropriately","Specialists are expected to give binding legal advice on any topic","Legal advice is required at every enrollment","There is no distinction between financial counseling and legal advice at NCCB"],"a":0,"exp":""},{"q":"What is the purpose of a 'certification/signature block' on program enrollment documents?","opts":["To document the client's informed consent and acknowledgment of disclosed terms","It is purely decorative","It replaces the need for any fee disclosure","It is only used for internal NCCB paperwork, not client-facing"],"a":0,"exp":""},{"q":"A client asks why NCCB charges a retainer before program fees. What is an appropriate, compliant response?","opts":["Explain the retainer structure and fee sequence transparently as disclosed, and provide it in writing if requested","Tell the client retainers are illegal so there is nothing to explain","Avoid answering and change the subject","Tell the client the retainer is fully refundable no matter what, without checking policy"],"a":0,"exp":""},{"q":"Why does NCCB require specialists to log outcome status and next-step notes after every call?","opts":["To support consistent client follow-up and provide an auditable compliance trail","Only to help specialists compete on a leaderboard","It is required only for calls that result in a sale","It is optional documentation with no operational purpose"],"a":0,"exp":""},{"q":"If a client requests cancellation of their Debt Management program, what is the compliant response?","opts":["Follow the documented cancellation process and honor the client's right to cancel per program terms","Refuse the cancellation request outright","Ignore the request until the client calls three more times","Charge an undisclosed penalty fee not in the original agreement"],"a":0,"exp":""},{"q":"What is the significance of a client's 'active' versus 'delinquent' status within a DMP for reporting purposes?","opts":["It reflects whether scheduled payments are current, which affects creditor concessions and program standing","Status has no effect on the program","Only delinquent clients are tracked","Active status guarantees a fixed credit score increase"],"a":0,"exp":""},{"q":"Which is the most appropriate objection-handling approach when a prospect says 'I can just negotiate with my creditors myself'?","opts":["Acknowledge the option, then explain the value of professional negotiation, consolidated payments, and program structure","Argue that self-negotiation is illegal","Hang up since the prospect is not interested","Guarantee the prospect worse outcomes with no evidence"],"a":0,"exp":""},{"q":"What does 'escrow' generally refer to in a program fee structure context?","opts":["Funds held by a third party or the organization for a specific purpose until conditions are met","A type of credit score","A federal telemarketing law","A synonym for retainer with no functional difference"],"a":0,"exp":""},{"q":"Why should a specialist avoid guaranteeing a specific dollar amount of debt reduction to a prospect?","opts":["Outcomes depend on creditor negotiations and individual circumstances, so guarantees can be misleading and non-compliant","Guarantees are always accurate and encouraged","It is fine as long as the client does not ask for it in writing","There is no compliance concern with guarantees"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding creditor concession negotiation?","opts":["Specialists must follow documented NCCB policy and disclosure standards for creditor concession negotiation","NCCB has no policy governing creditor concession negotiation","Policy for creditor concession negotiation is left entirely to individual discretion with no documentation","Creditor concession negotiation is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding FDCPA collector conduct rules?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FDCPA collector conduct rules","NCCB has no policy governing FDCPA collector conduct rules","Policy for FDCPA collector conduct rules is left entirely to individual discretion with no documentation","Fdcpa collector conduct rules is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding OCCC Chapter 394 licensing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for OCCC Chapter 394 licensing","NCCB has no policy governing OCCC Chapter 394 licensing","Policy for OCCC Chapter 394 licensing is left entirely to individual discretion with no documentation","Occc chapter 394 licensing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding compliant fee disclosure timing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for compliant fee disclosure timing","NCCB has no policy governing compliant fee disclosure timing","Policy for compliant fee disclosure timing is left entirely to individual discretion with no documentation","Compliant fee disclosure timing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Settlement fee structure?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Settlement fee structure","NCCB has no policy governing the Debt Settlement fee structure","Policy for the Debt Settlement fee structure is left entirely to individual discretion with no documentation","The debt settlement fee structure is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Management fee sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Management fee sequence","NCCB has no policy governing the Debt Management fee sequence","Policy for the Debt Management fee sequence is left entirely to individual discretion with no documentation","The debt management fee sequence is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Management fee sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Management fee sequence","NCCB has no policy governing the Debt Management fee sequence","Policy for the Debt Management fee sequence is left entirely to individual discretion with no documentation","The debt management fee sequence is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding TCPA consent requirements?","opts":["Specialists must follow documented NCCB policy and disclosure standards for TCPA consent requirements","NCCB has no policy governing TCPA consent requirements","Policy for TCPA consent requirements is left entirely to individual discretion with no documentation","Tcpa consent requirements is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding compliant fee disclosure timing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for compliant fee disclosure timing","NCCB has no policy governing compliant fee disclosure timing","Policy for compliant fee disclosure timing is left entirely to individual discretion with no documentation","Compliant fee disclosure timing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding FDCPA collector conduct rules?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FDCPA collector conduct rules","NCCB has no policy governing FDCPA collector conduct rules","Policy for FDCPA collector conduct rules is left entirely to individual discretion with no documentation","Fdcpa collector conduct rules is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding creditor concession negotiation?","opts":["Specialists must follow documented NCCB policy and disclosure standards for creditor concession negotiation","NCCB has no policy governing creditor concession negotiation","Policy for creditor concession negotiation is left entirely to individual discretion with no documentation","Creditor concession negotiation is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding compliant fee disclosure timing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for compliant fee disclosure timing","NCCB has no policy governing compliant fee disclosure timing","Policy for compliant fee disclosure timing is left entirely to individual discretion with no documentation","Compliant fee disclosure timing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the minimum-debt enrollment gate?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the minimum-debt enrollment gate","NCCB has no policy governing the minimum-debt enrollment gate","Policy for the minimum-debt enrollment gate is left entirely to individual discretion with no documentation","The minimum-debt enrollment gate is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding FDCPA collector conduct rules?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FDCPA collector conduct rules","NCCB has no policy governing FDCPA collector conduct rules","Policy for FDCPA collector conduct rules is left entirely to individual discretion with no documentation","Fdcpa collector conduct rules is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding objection handling with a skeptical prospect?","opts":["Specialists must follow documented NCCB policy and disclosure standards for objection handling with a skeptical prospect","NCCB has no policy governing objection handling with a skeptical prospect","Policy for objection handling with a skeptical prospect is left entirely to individual discretion with no documentation","Objection handling with a skeptical prospect is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding escalation procedure per the SOP?","opts":["Specialists must follow documented NCCB policy and disclosure standards for escalation procedure per the SOP","NCCB has no policy governing escalation procedure per the SOP","Policy for escalation procedure per the SOP is left entirely to individual discretion with no documentation","Escalation procedure per the sop is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding OCCC Chapter 394 licensing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for OCCC Chapter 394 licensing","NCCB has no policy governing OCCC Chapter 394 licensing","Policy for OCCC Chapter 394 licensing is left entirely to individual discretion with no documentation","Occc chapter 394 licensing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding OCCC Chapter 394 licensing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for OCCC Chapter 394 licensing","NCCB has no policy governing OCCC Chapter 394 licensing","Policy for OCCC Chapter 394 licensing is left entirely to individual discretion with no documentation","Occc chapter 394 licensing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding FDCPA collector conduct rules?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FDCPA collector conduct rules","NCCB has no policy governing FDCPA collector conduct rules","Policy for FDCPA collector conduct rules is left entirely to individual discretion with no documentation","Fdcpa collector conduct rules is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Management fee sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Management fee sequence","NCCB has no policy governing the Debt Management fee sequence","Policy for the Debt Management fee sequence is left entirely to individual discretion with no documentation","The debt management fee sequence is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Management fee sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Management fee sequence","NCCB has no policy governing the Debt Management fee sequence","Policy for the Debt Management fee sequence is left entirely to individual discretion with no documentation","The debt management fee sequence is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the minimum-debt enrollment gate?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the minimum-debt enrollment gate","NCCB has no policy governing the minimum-debt enrollment gate","Policy for the minimum-debt enrollment gate is left entirely to individual discretion with no documentation","The minimum-debt enrollment gate is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding objection handling with a skeptical prospect?","opts":["Specialists must follow documented NCCB policy and disclosure standards for objection handling with a skeptical prospect","NCCB has no policy governing objection handling with a skeptical prospect","Policy for objection handling with a skeptical prospect is left entirely to individual discretion with no documentation","Objection handling with a skeptical prospect is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding OCCC Chapter 394 licensing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for OCCC Chapter 394 licensing","NCCB has no policy governing OCCC Chapter 394 licensing","Policy for OCCC Chapter 394 licensing is left entirely to individual discretion with no documentation","Occc chapter 394 licensing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the minimum-debt enrollment gate?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the minimum-debt enrollment gate","NCCB has no policy governing the minimum-debt enrollment gate","Policy for the minimum-debt enrollment gate is left entirely to individual discretion with no documentation","The minimum-debt enrollment gate is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Management fee sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Management fee sequence","NCCB has no policy governing the Debt Management fee sequence","Policy for the Debt Management fee sequence is left entirely to individual discretion with no documentation","The debt management fee sequence is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding compliant fee disclosure timing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for compliant fee disclosure timing","NCCB has no policy governing compliant fee disclosure timing","Policy for compliant fee disclosure timing is left entirely to individual discretion with no documentation","Compliant fee disclosure timing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding creditor concession negotiation?","opts":["Specialists must follow documented NCCB policy and disclosure standards for creditor concession negotiation","NCCB has no policy governing creditor concession negotiation","Policy for creditor concession negotiation is left entirely to individual discretion with no documentation","Creditor concession negotiation is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding compliant fee disclosure timing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for compliant fee disclosure timing","NCCB has no policy governing compliant fee disclosure timing","Policy for compliant fee disclosure timing is left entirely to individual discretion with no documentation","Compliant fee disclosure timing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the minimum-debt enrollment gate?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the minimum-debt enrollment gate","NCCB has no policy governing the minimum-debt enrollment gate","Policy for the minimum-debt enrollment gate is left entirely to individual discretion with no documentation","The minimum-debt enrollment gate is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding escalation procedure per the SOP?","opts":["Specialists must follow documented NCCB policy and disclosure standards for escalation procedure per the SOP","NCCB has no policy governing escalation procedure per the SOP","Policy for escalation procedure per the SOP is left entirely to individual discretion with no documentation","Escalation procedure per the sop is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Management fee sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Management fee sequence","NCCB has no policy governing the Debt Management fee sequence","Policy for the Debt Management fee sequence is left entirely to individual discretion with no documentation","The debt management fee sequence is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding CRM documentation standards?","opts":["Specialists must follow documented NCCB policy and disclosure standards for CRM documentation standards","NCCB has no policy governing CRM documentation standards","Policy for CRM documentation standards is left entirely to individual discretion with no documentation","Crm documentation standards is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding objection handling with a skeptical prospect?","opts":["Specialists must follow documented NCCB policy and disclosure standards for objection handling with a skeptical prospect","NCCB has no policy governing objection handling with a skeptical prospect","Policy for objection handling with a skeptical prospect is left entirely to individual discretion with no documentation","Objection handling with a skeptical prospect is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Settlement fee structure?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Settlement fee structure","NCCB has no policy governing the Debt Settlement fee structure","Policy for the Debt Settlement fee structure is left entirely to individual discretion with no documentation","The debt settlement fee structure is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding OCCC Chapter 394 licensing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for OCCC Chapter 394 licensing","NCCB has no policy governing OCCC Chapter 394 licensing","Policy for OCCC Chapter 394 licensing is left entirely to individual discretion with no documentation","Occc chapter 394 licensing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding TCPA consent requirements?","opts":["Specialists must follow documented NCCB policy and disclosure standards for TCPA consent requirements","NCCB has no policy governing TCPA consent requirements","Policy for TCPA consent requirements is left entirely to individual discretion with no documentation","Tcpa consent requirements is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding compliant fee disclosure timing?","opts":["Specialists must follow documented NCCB policy and disclosure standards for compliant fee disclosure timing","NCCB has no policy governing compliant fee disclosure timing","Policy for compliant fee disclosure timing is left entirely to individual discretion with no documentation","Compliant fee disclosure timing is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding escalation procedure per the SOP?","opts":["Specialists must follow documented NCCB policy and disclosure standards for escalation procedure per the SOP","NCCB has no policy governing escalation procedure per the SOP","Policy for escalation procedure per the SOP is left entirely to individual discretion with no documentation","Escalation procedure per the sop is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding DMP versus Debt Settlement outcomes?","opts":["Specialists must follow documented NCCB policy and disclosure standards for DMP versus Debt Settlement outcomes","NCCB has no policy governing DMP versus Debt Settlement outcomes","Policy for DMP versus Debt Settlement outcomes is left entirely to individual discretion with no documentation","Dmp versus debt settlement outcomes is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Settlement fee structure?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Settlement fee structure","NCCB has no policy governing the Debt Settlement fee structure","Policy for the Debt Settlement fee structure is left entirely to individual discretion with no documentation","The debt settlement fee structure is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding TCPA consent requirements?","opts":["Specialists must follow documented NCCB policy and disclosure standards for TCPA consent requirements","NCCB has no policy governing TCPA consent requirements","Policy for TCPA consent requirements is left entirely to individual discretion with no documentation","Tcpa consent requirements is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding the Debt Management fee sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Debt Management fee sequence","NCCB has no policy governing the Debt Management fee sequence","Policy for the Debt Management fee sequence is left entirely to individual discretion with no documentation","The debt management fee sequence is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding DMP versus Debt Settlement outcomes?","opts":["Specialists must follow documented NCCB policy and disclosure standards for DMP versus Debt Settlement outcomes","NCCB has no policy governing DMP versus Debt Settlement outcomes","Policy for DMP versus Debt Settlement outcomes is left entirely to individual discretion with no documentation","Dmp versus debt settlement outcomes is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding FDCPA collector conduct rules?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FDCPA collector conduct rules","NCCB has no policy governing FDCPA collector conduct rules","Policy for FDCPA collector conduct rules is left entirely to individual discretion with no documentation","Fdcpa collector conduct rules is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding FDCPA collector conduct rules?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FDCPA collector conduct rules","NCCB has no policy governing FDCPA collector conduct rules","Policy for FDCPA collector conduct rules is left entirely to individual discretion with no documentation","Fdcpa collector conduct rules is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding escalation procedure per the SOP?","opts":["Specialists must follow documented NCCB policy and disclosure standards for escalation procedure per the SOP","NCCB has no policy governing escalation procedure per the SOP","Policy for escalation procedure per the SOP is left entirely to individual discretion with no documentation","Escalation procedure per the sop is only relevant to management, not specialists"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB policy regarding FDCPA collector conduct rules?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FDCPA collector conduct rules","NCCB has no policy governing FDCPA collector conduct rules","Policy for FDCPA collector conduct rules is left entirely to individual discretion with no documentation","Fdcpa collector conduct rules is only relevant to management, not specialists"],"a":0,"exp":""}],"ccs":[{"q":"What is the current fee for the My800Scores monitoring/scoring product?","opts":["$39.99 per month","$175.95 flat fee","$559 retainer","$35 per account"],"a":0,"exp":""},{"q":"What is the current Credit Counseling program fee?","opts":["$175.95, no retainer","$559 retainer plus 10%","$39.99 per month","$35 per account"],"a":0,"exp":""},{"q":"What is the current Credit Restoration program fee structure?","opts":["$35 per account, no retainer, with a $105 minimum escrow covering 3 accounts","$175.95 flat with no minimum","$559 retainer plus 18%","$39.99 per month per account"],"a":0,"exp":""},{"q":"Which federal law governs the accuracy, use, and dispute rights around consumer credit report information?","opts":["Fair Credit Reporting Act (FCRA)","Truth in Lending Act (TILA)","Fair Debt Collection Practices Act (FDCPA)","Real Estate Settlement Procedures Act (RESPA)"],"a":0,"exp":""},{"q":"Under the FCRA, how long generally does a credit bureau have to investigate a consumer dispute after receiving it?","opts":["30 days (up to 45 in some cases)","5 days","1 year","There is no time limit"],"a":0,"exp":""},{"q":"What are the three major consumer credit bureaus a Credit Counselor Specialist should reference?","opts":["Equifax, Experian, and TransUnion","Equifax, FICO, and VantageScore","Experian, Chase, and Wells Fargo","TransUnion, Moody's, and S&P"],"a":0,"exp":""},{"q":"Which factor typically has the largest impact on a FICO credit score?","opts":["Payment history","Number of hard inquiries","Length of credit history","Credit mix"],"a":0,"exp":"Payment history is generally the single largest weighted factor in FICO scoring models, followed by amounts owed/utilization."},{"q":"What does 'credit utilization' refer to?","opts":["The percentage of available revolving credit currently being used","The number of credit inquiries in the last year","The total number of open accounts","The average age of all accounts"],"a":0,"exp":""},{"q":"A client wants to dispute an inaccurate late payment on their credit report. What is the specialist's appropriate first step?","opts":["Review the account details with the client and prepare a proper dispute per FCRA procedures","Tell the client disputes never work so there is no point","File the dispute without reviewing any documentation","Advise the client to ignore the error since it will disappear on its own"],"a":0,"exp":""},{"q":"What is the purpose of the $105 minimum escrow requirement in the Credit Restoration program?","opts":["It corresponds to the $35-per-account fee applied across a minimum of 3 accounts","It is an arbitrary number with no basis","It is a penalty fee for late payment","It replaces the need for any fee disclosure"],"a":0,"exp":""},{"q":"Which of the following is NOT one of the 'Big 3' credit bureaus?","opts":["Innovis","Equifax","Experian","TransUnion"],"a":0,"exp":"Innovis is a smaller, less commonly used bureau; Equifax, Experian, and TransUnion are the three major bureaus."},{"q":"What should a Credit Counselor Specialist explain about the difference between a 'soft' and 'hard' credit inquiry?","opts":["A hard inquiry can affect a score and results from a credit application; a soft inquiry does not affect score and includes things like pre-qualification checks","Both types affect the score equally","Soft inquiries always lower a score more than hard inquiries","There is no meaningful distinction"],"a":0,"exp":""},{"q":"A client asks how long a late payment stays on their credit report. What is the generally accurate answer?","opts":["Typically up to 7 years from the date of the original delinquency","It never comes off","30 days","1 year, always"],"a":0,"exp":""},{"q":"What is the primary purpose of a credit counseling session at NCCB?","opts":["To assess the client's financial situation and recommend an appropriate program or budgeting path","To sell the highest-fee program regardless of client fit","To collect payment only, with no assessment","To replace the need for any further documentation"],"a":0,"exp":""},{"q":"Which of these best describes 'debt-to-income ratio' (DTI)?","opts":["The percentage of gross monthly income that goes toward debt payments","The total dollar amount of all debts combined","A synonym for credit utilization","The number of active credit accounts a person holds"],"a":0,"exp":""},{"q":"What should a Credit Counselor Specialist do if a client's credit report shows an account that does not belong to them (possible identity theft)?","opts":["Advise the client on the identity theft dispute process and appropriate documentation (e.g., police report, FTC report)","Ignore it since it is outside the counselor's role entirely","Tell the client it cannot be removed under any circumstance","Automatically assume it is a data entry error with no further action"],"a":0,"exp":""},{"q":"What is a 'goodwill letter' in the context of credit restoration?","opts":["A request to a creditor asking them to remove an accurate but negative mark as a courtesy, often after an otherwise good payment history","A legally binding demand with guaranteed removal","A required first step in every FCRA dispute","A synonym for a formal FCRA dispute letter"],"a":0,"exp":""},{"q":"Which best describes the role of My800Scores within the NCCB product lineup?","opts":["A monitoring/scoring product often bundled ahead of Credit Counseling or Credit Restoration enrollment per the fee sequence","A standalone debt settlement product","A bankruptcy filing service","A mortgage refinancing product"],"a":0,"exp":""},{"q":"A prospect says their score is 'too low to fix.' What is an appropriate, compliant counselor response?","opts":["Explain that scores can generally improve over time through disputes, on-time payments, and utilization management, without guaranteeing a specific outcome","Agree that nothing can be done","Guarantee a specific score increase by a specific date","Tell them to stop checking their credit entirely"],"a":0,"exp":""},{"q":"What should a specialist avoid promising regarding credit restoration outcomes, per general compliance standards (e.g., CROA-adjacent principles)?","opts":["Guaranteed removal of accurate negative information or a guaranteed score increase","Explaining the general dispute process","Disclosing program fees","Setting realistic expectations about timelines"],"a":0,"exp":"Similar to Credit Repair Organizations Act (CROA) principles, guaranteeing removal of accurate negative info or a specific score outcome is not compliant."},{"q":"What is the standard passing score requirement for NCCB certification exams?","opts":["More than 80%","Exactly 50%","100%, no exceptions","There is no passing threshold"],"a":0,"exp":""},{"q":"Which of these is an appropriate first step before beginning any counseling engagement with a new client?","opts":["Disclose applicable fees per the correct sequence and confirm client understanding","Collect payment with no disclosure","Skip any assessment and immediately enroll them","Assume the client already knows all program details"],"a":0,"exp":""},{"q":"What does 'credit mix' refer to as a scoring factor?","opts":["The variety of account types a consumer holds (e.g., revolving credit cards, installment loans)","The number of hard inquiries in the past year","The average balance across all accounts","The consumer's income level"],"a":0,"exp":""},{"q":"A client wants to know if closing an old, unused credit card will help their score. What is the most accurate general guidance?","opts":["Closing an old account can shorten average credit history and reduce available credit, potentially lowering the score","Closing old accounts always raises the score immediately","Account age and available credit have no effect on score","Closing accounts has no relationship to credit utilization"],"a":0,"exp":""},{"q":"What is the purpose of documenting every counseling session's outcome in the CRM, even if the client does not enroll?","opts":["To maintain an accurate, auditable record of client interactions for compliance and follow-up","Only enrolled clients require documentation","Documentation is optional for counseling sessions","It has no operational or compliance value"],"a":0,"exp":""},{"q":"Which of these is a legitimate credit-building recommendation a counselor could ethically make?","opts":["Making on-time payments and keeping utilization low over time","Guaranteeing a 100-point score increase in 30 days","Advising the client to open several new accounts simultaneously with no context","Recommending the client ignore collection notices"],"a":0,"exp":""},{"q":"What is the relationship between the Credit Restoration program and the minimum 3-account escrow requirement?","opts":["The $35 per-account fee is applied to at least 3 accounts, producing the $105 minimum","There is no relationship","The escrow covers unlimited accounts regardless of count","It applies only to Debt Management clients"],"a":0,"exp":""},{"q":"A client asks whether paying off a collection account in full will immediately remove it from their credit report.","opts":["Not necessarily \u2014 paying a collection does not guarantee automatic removal, though it may be reflected as paid","Yes, it is always removed automatically the same day","Paid collections never appear on credit reports at all","It has no effect on the report whatsoever"],"a":0,"exp":""},{"q":"Why is it important for a counselor to review a client's full credit report before recommending a program?","opts":["To accurately identify which accounts, disputes, or programs best fit the client's actual situation","Reports are irrelevant to program placement","Only the client's stated debt amount matters, not report detail","Reviewing the report is optional and rarely useful"],"a":0,"exp":""},{"q":"What is an appropriate response if a client becomes emotional or frustrated discussing their credit situation?","opts":["Acknowledge their concerns professionally, stay calm, and guide the conversation back to actionable next steps","End the call immediately","Dismiss their concerns as unimportant","Match their frustration with an equally emotional response"],"a":0,"exp":""},{"q":"Which of these best describes a 'secured credit card' and its typical use case in credit building?","opts":["A card backed by a cash deposit, often used to build or rebuild credit history","A card with unlimited credit and no deposit","A card that cannot be reported to credit bureaus","A synonym for a debit card"],"a":0,"exp":""},{"q":"What should a Credit Counselor Specialist do if a client asks a question outside their expertise (e.g., a specific legal question)?","opts":["Refer the client to an appropriate resource rather than provide legal advice","Answer confidently even without certainty","Ignore the question entirely","Tell the client no one can help them"],"a":0,"exp":""},{"q":"What is the significance of the 'no retainer' language in the Credit Counseling and Credit Restoration fee descriptions?","opts":["It clarifies that clients are not charged an upfront retainer fee for these specific programs, unlike Debt Settlement/Debt Management","It means the programs are entirely free","It means fees are never disclosed","It applies to every NCCB program equally"],"a":0,"exp":""},{"q":"What is a reasonable timeline expectation a counselor might set for typical credit restoration progress, without guaranteeing results?","opts":["Explain that timelines vary by case and bureau response times, generally spanning multiple billing cycles","Guarantee results within 48 hours","Tell the client results are instant","Refuse to discuss timeline at all"],"a":0,"exp":""},{"q":"Which of the following is considered sensitive information that should be handled carefully and documented securely during intake?","opts":["Social Security Number and full credit report details","The client's favorite color","The weather on the day of the call","The specialist's own contact preferences"],"a":0,"exp":""},{"q":"What is the value of explaining 'payment history' as a scoring factor to a client considering a Debt Management referral instead of Credit Restoration?","opts":["It helps the client understand why consistent on-time payments matter regardless of which program they choose","Payment history is irrelevant to either program","Only Credit Restoration clients need to understand payment history","It has no educational value"],"a":0,"exp":""},{"q":"Which of these is an appropriate way to explain the counselor's role to a new client?","opts":["An educator and guide who assesses the client's situation and recommends appropriate, disclosed options","A guaranteed fixer of all credit problems with no client involvement needed","A collections agent","A lender approving new credit"],"a":0,"exp":""},{"q":"What must be true before a Credit Counselor Specialist submits a dispute on a client's behalf?","opts":["The client's authorization/consent and accurate supporting documentation must be obtained","Nothing \u2014 disputes can be filed without any client involvement","The dispute must guarantee removal before filing","Only verbal mention from the client is required with no documentation"],"a":0,"exp":""},{"q":"Why might a counselor recommend a client wait before applying for new credit while working on restoration?","opts":["New hard inquiries and new accounts can temporarily affect scoring factors during an active repair process","New credit applications have zero effect on scoring","Waiting has no strategic value","This is never appropriate advice"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding scoring factor education for clients?","opts":["Specialists must follow documented NCCB policy and disclosure standards for scoring factor education for clients","NCCB has no policy governing scoring factor education for clients","Policy for scoring factor education for clients is left entirely to individual discretion with no documentation","Scoring factor education for clients is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding scoring factor education for clients?","opts":["Specialists must follow documented NCCB policy and disclosure standards for scoring factor education for clients","NCCB has no policy governing scoring factor education for clients","Policy for scoring factor education for clients is left entirely to individual discretion with no documentation","Scoring factor education for clients is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding goodwill letter requests?","opts":["Specialists must follow documented NCCB policy and disclosure standards for goodwill letter requests","NCCB has no policy governing goodwill letter requests","Policy for goodwill letter requests is left entirely to individual discretion with no documentation","Goodwill letter requests is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding credit bureau reporting timelines?","opts":["Specialists must follow documented NCCB policy and disclosure standards for credit bureau reporting timelines","NCCB has no policy governing credit bureau reporting timelines","Policy for credit bureau reporting timelines is left entirely to individual discretion with no documentation","Credit bureau reporting timelines is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the My800Scores fee?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the My800Scores fee","NCCB has no policy governing the My800Scores fee","Policy for the My800Scores fee is left entirely to individual discretion with no documentation","The my800scores fee is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding referral to Debt Management when appropriate?","opts":["Specialists must follow documented NCCB policy and disclosure standards for referral to Debt Management when appropriate","NCCB has no policy governing referral to Debt Management when appropriate","Policy for referral to Debt Management when appropriate is left entirely to individual discretion with no documentation","Referral to debt management when appropriate is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding documentation standards for counseling sessions?","opts":["Specialists must follow documented NCCB policy and disclosure standards for documentation standards for counseling sessions","NCCB has no policy governing documentation standards for counseling sessions","Policy for documentation standards for counseling sessions is left entirely to individual discretion with no documentation","Documentation standards for counseling sessions is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding identity theft dispute guidance?","opts":["Specialists must follow documented NCCB policy and disclosure standards for identity theft dispute guidance","NCCB has no policy governing identity theft dispute guidance","Policy for identity theft dispute guidance is left entirely to individual discretion with no documentation","Identity theft dispute guidance is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the Credit Counseling fee?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Credit Counseling fee","NCCB has no policy governing the Credit Counseling fee","Policy for the Credit Counseling fee is left entirely to individual discretion with no documentation","The credit counseling fee is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding compliant outcome expectations?","opts":["Specialists must follow documented NCCB policy and disclosure standards for compliant outcome expectations","NCCB has no policy governing compliant outcome expectations","Policy for compliant outcome expectations is left entirely to individual discretion with no documentation","Compliant outcome expectations is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the Credit Counseling fee?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Credit Counseling fee","NCCB has no policy governing the Credit Counseling fee","Policy for the Credit Counseling fee is left entirely to individual discretion with no documentation","The credit counseling fee is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding identity theft dispute guidance?","opts":["Specialists must follow documented NCCB policy and disclosure standards for identity theft dispute guidance","NCCB has no policy governing identity theft dispute guidance","Policy for identity theft dispute guidance is left entirely to individual discretion with no documentation","Identity theft dispute guidance is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding credit bureau reporting timelines?","opts":["Specialists must follow documented NCCB policy and disclosure standards for credit bureau reporting timelines","NCCB has no policy governing credit bureau reporting timelines","Policy for credit bureau reporting timelines is left entirely to individual discretion with no documentation","Credit bureau reporting timelines is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the correct fee disclosure sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the correct fee disclosure sequence","NCCB has no policy governing the correct fee disclosure sequence","Policy for the correct fee disclosure sequence is left entirely to individual discretion with no documentation","The correct fee disclosure sequence is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding goodwill letter requests?","opts":["Specialists must follow documented NCCB policy and disclosure standards for goodwill letter requests","NCCB has no policy governing goodwill letter requests","Policy for goodwill letter requests is left entirely to individual discretion with no documentation","Goodwill letter requests is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding scoring factor education for clients?","opts":["Specialists must follow documented NCCB policy and disclosure standards for scoring factor education for clients","NCCB has no policy governing scoring factor education for clients","Policy for scoring factor education for clients is left entirely to individual discretion with no documentation","Scoring factor education for clients is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding goodwill letter requests?","opts":["Specialists must follow documented NCCB policy and disclosure standards for goodwill letter requests","NCCB has no policy governing goodwill letter requests","Policy for goodwill letter requests is left entirely to individual discretion with no documentation","Goodwill letter requests is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding FCRA dispute rights?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FCRA dispute rights","NCCB has no policy governing FCRA dispute rights","Policy for FCRA dispute rights is left entirely to individual discretion with no documentation","Fcra dispute rights is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding referral to Debt Management when appropriate?","opts":["Specialists must follow documented NCCB policy and disclosure standards for referral to Debt Management when appropriate","NCCB has no policy governing referral to Debt Management when appropriate","Policy for referral to Debt Management when appropriate is left entirely to individual discretion with no documentation","Referral to debt management when appropriate is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the Credit Counseling fee?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Credit Counseling fee","NCCB has no policy governing the Credit Counseling fee","Policy for the Credit Counseling fee is left entirely to individual discretion with no documentation","The credit counseling fee is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the My800Scores fee?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the My800Scores fee","NCCB has no policy governing the My800Scores fee","Policy for the My800Scores fee is left entirely to individual discretion with no documentation","The my800scores fee is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the correct fee disclosure sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the correct fee disclosure sequence","NCCB has no policy governing the correct fee disclosure sequence","Policy for the correct fee disclosure sequence is left entirely to individual discretion with no documentation","The correct fee disclosure sequence is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding FCRA dispute rights?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FCRA dispute rights","NCCB has no policy governing FCRA dispute rights","Policy for FCRA dispute rights is left entirely to individual discretion with no documentation","Fcra dispute rights is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding credit bureau reporting timelines?","opts":["Specialists must follow documented NCCB policy and disclosure standards for credit bureau reporting timelines","NCCB has no policy governing credit bureau reporting timelines","Policy for credit bureau reporting timelines is left entirely to individual discretion with no documentation","Credit bureau reporting timelines is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the Credit Counseling fee?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Credit Counseling fee","NCCB has no policy governing the Credit Counseling fee","Policy for the Credit Counseling fee is left entirely to individual discretion with no documentation","The credit counseling fee is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding FCRA dispute rights?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FCRA dispute rights","NCCB has no policy governing FCRA dispute rights","Policy for FCRA dispute rights is left entirely to individual discretion with no documentation","Fcra dispute rights is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the Credit Counseling fee?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Credit Counseling fee","NCCB has no policy governing the Credit Counseling fee","Policy for the Credit Counseling fee is left entirely to individual discretion with no documentation","The credit counseling fee is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding compliant outcome expectations?","opts":["Specialists must follow documented NCCB policy and disclosure standards for compliant outcome expectations","NCCB has no policy governing compliant outcome expectations","Policy for compliant outcome expectations is left entirely to individual discretion with no documentation","Compliant outcome expectations is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding credit bureau reporting timelines?","opts":["Specialists must follow documented NCCB policy and disclosure standards for credit bureau reporting timelines","NCCB has no policy governing credit bureau reporting timelines","Policy for credit bureau reporting timelines is left entirely to individual discretion with no documentation","Credit bureau reporting timelines is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding documentation standards for counseling sessions?","opts":["Specialists must follow documented NCCB policy and disclosure standards for documentation standards for counseling sessions","NCCB has no policy governing documentation standards for counseling sessions","Policy for documentation standards for counseling sessions is left entirely to individual discretion with no documentation","Documentation standards for counseling sessions is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the correct fee disclosure sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the correct fee disclosure sequence","NCCB has no policy governing the correct fee disclosure sequence","Policy for the correct fee disclosure sequence is left entirely to individual discretion with no documentation","The correct fee disclosure sequence is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding scoring factor education for clients?","opts":["Specialists must follow documented NCCB policy and disclosure standards for scoring factor education for clients","NCCB has no policy governing scoring factor education for clients","Policy for scoring factor education for clients is left entirely to individual discretion with no documentation","Scoring factor education for clients is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the Credit Restoration escrow structure?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Credit Restoration escrow structure","NCCB has no policy governing the Credit Restoration escrow structure","Policy for the Credit Restoration escrow structure is left entirely to individual discretion with no documentation","The credit restoration escrow structure is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding scoring factor education for clients?","opts":["Specialists must follow documented NCCB policy and disclosure standards for scoring factor education for clients","NCCB has no policy governing scoring factor education for clients","Policy for scoring factor education for clients is left entirely to individual discretion with no documentation","Scoring factor education for clients is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding scoring factor education for clients?","opts":["Specialists must follow documented NCCB policy and disclosure standards for scoring factor education for clients","NCCB has no policy governing scoring factor education for clients","Policy for scoring factor education for clients is left entirely to individual discretion with no documentation","Scoring factor education for clients is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding FCRA dispute rights?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FCRA dispute rights","NCCB has no policy governing FCRA dispute rights","Policy for FCRA dispute rights is left entirely to individual discretion with no documentation","Fcra dispute rights is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the correct fee disclosure sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the correct fee disclosure sequence","NCCB has no policy governing the correct fee disclosure sequence","Policy for the correct fee disclosure sequence is left entirely to individual discretion with no documentation","The correct fee disclosure sequence is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding credit bureau reporting timelines?","opts":["Specialists must follow documented NCCB policy and disclosure standards for credit bureau reporting timelines","NCCB has no policy governing credit bureau reporting timelines","Policy for credit bureau reporting timelines is left entirely to individual discretion with no documentation","Credit bureau reporting timelines is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding referral to Debt Management when appropriate?","opts":["Specialists must follow documented NCCB policy and disclosure standards for referral to Debt Management when appropriate","NCCB has no policy governing referral to Debt Management when appropriate","Policy for referral to Debt Management when appropriate is left entirely to individual discretion with no documentation","Referral to debt management when appropriate is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the correct fee disclosure sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the correct fee disclosure sequence","NCCB has no policy governing the correct fee disclosure sequence","Policy for the correct fee disclosure sequence is left entirely to individual discretion with no documentation","The correct fee disclosure sequence is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the correct fee disclosure sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the correct fee disclosure sequence","NCCB has no policy governing the correct fee disclosure sequence","Policy for the correct fee disclosure sequence is left entirely to individual discretion with no documentation","The correct fee disclosure sequence is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the Credit Counseling fee?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Credit Counseling fee","NCCB has no policy governing the Credit Counseling fee","Policy for the Credit Counseling fee is left entirely to individual discretion with no documentation","The credit counseling fee is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding goodwill letter requests?","opts":["Specialists must follow documented NCCB policy and disclosure standards for goodwill letter requests","NCCB has no policy governing goodwill letter requests","Policy for goodwill letter requests is left entirely to individual discretion with no documentation","Goodwill letter requests is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the correct fee disclosure sequence?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the correct fee disclosure sequence","NCCB has no policy governing the correct fee disclosure sequence","Policy for the correct fee disclosure sequence is left entirely to individual discretion with no documentation","The correct fee disclosure sequence is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the Credit Restoration escrow structure?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Credit Restoration escrow structure","NCCB has no policy governing the Credit Restoration escrow structure","Policy for the Credit Restoration escrow structure is left entirely to individual discretion with no documentation","The credit restoration escrow structure is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding identity theft dispute guidance?","opts":["Specialists must follow documented NCCB policy and disclosure standards for identity theft dispute guidance","NCCB has no policy governing identity theft dispute guidance","Policy for identity theft dispute guidance is left entirely to individual discretion with no documentation","Identity theft dispute guidance is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding referral to Debt Management when appropriate?","opts":["Specialists must follow documented NCCB policy and disclosure standards for referral to Debt Management when appropriate","NCCB has no policy governing referral to Debt Management when appropriate","Policy for referral to Debt Management when appropriate is left entirely to individual discretion with no documentation","Referral to debt management when appropriate is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding FCRA dispute rights?","opts":["Specialists must follow documented NCCB policy and disclosure standards for FCRA dispute rights","NCCB has no policy governing FCRA dispute rights","Policy for FCRA dispute rights is left entirely to individual discretion with no documentation","Fcra dispute rights is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding the Credit Restoration escrow structure?","opts":["Specialists must follow documented NCCB policy and disclosure standards for the Credit Restoration escrow structure","NCCB has no policy governing the Credit Restoration escrow structure","Policy for the Credit Restoration escrow structure is left entirely to individual discretion with no documentation","The credit restoration escrow structure is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding documentation standards for counseling sessions?","opts":["Specialists must follow documented NCCB policy and disclosure standards for documentation standards for counseling sessions","NCCB has no policy governing documentation standards for counseling sessions","Policy for documentation standards for counseling sessions is left entirely to individual discretion with no documentation","Documentation standards for counseling sessions is only relevant to management, not counselors"],"a":0,"exp":""},{"q":"Which statement correctly reflects NCCB Credit Counselor policy regarding compliant outcome expectations?","opts":["Specialists must follow documented NCCB policy and disclosure standards for compliant outcome expectations","NCCB has no policy governing compliant outcome expectations","Policy for compliant outcome expectations is left entirely to individual discretion with no documentation","Compliant outcome expectations is only relevant to management, not counselors"],"a":0,"exp":""}]};
+
+const PASS_PCT = 80;
+let currentUser = null;
+let currentExamKey = null;
+let currentAnswers = {};
+let localAttempts = JSON.parse(localStorage.getItem('nccb_cert_attempts_v1') || '[]');
+let lastResult = null;
+
+/* ---------------- LOGIN ---------------- */
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPin').value.trim();
+  const emp = EMPLOYEES.find(e => e.username.toLowerCase() === u.toLowerCase() && e.pin === p);
+  const errEl = document.getElementById('loginErr');
+  if(!emp){ errEl.style.display='block'; return; }
+  errEl.style.display='none';
+  currentUser = emp;
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('whoLabel').textContent = emp.name + (emp.admin ? ' · Administrator' : '');
+  buildTabs();
+  showView('dashboard');
+  if(emp.admin) refreshAdminData();
+}
+function logout(){
+  currentUser = null;
+  document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value=''; document.getElementById('loginPin').value='';
+}
+
+/* ---------------- TABS / VIEWS ---------------- */
+function buildTabs(){
+  const nav = document.getElementById('navTabs');
+  let html = `<button data-v="dashboard" onclick="showView('dashboard')">My Certifications</button>`;
+  if(currentUser.admin) html += `<button data-v="admin" onclick="showView('admin')">Admin Dashboard</button>`;
+  nav.innerHTML = html;
+  markTab('dashboard');
+}
+function markTab(v){
+  document.querySelectorAll('#navTabs button').forEach(b=>b.classList.toggle('active', b.dataset.v===v));
+}
+function showView(name){
+  ['dashboard','exam','results','cert','admin'].forEach(v=>{
+    document.getElementById('view-'+v).classList.toggle('hidden', v!==name);
+  });
+  if(name==='dashboard' || name==='admin') markTab(name);
+  if(name==='dashboard') renderDashboard();
+  if(name==='admin') renderAdmin();
+}
+
+/* ---------------- DASHBOARD ---------------- */
+function bestAttemptFor(username, examKey, source){
+  const list = source.filter(a => a.username===username && a.exam===examKey);
+  if(!list.length) return null;
+  return list.reduce((best,a)=> a.pct > best.pct ? a : best, list[0]);
+}
+function myAttemptsCombined(){
+  // merge local cache + (if loaded) server cache for this user
+  return (window.__adminCache || localAttempts).filter(a => a.username === currentUser.username);
+}
+function renderDashboard(){
+  const grid = document.getElementById('examGrid');
+  grid.innerHTML = '';
+  currentUser.access.forEach(key=>{
+    const ex = EXAMS[key];
+    const mine = myAttemptsCombined().filter(a=>a.exam===key);
+    const best = mine.length ? mine.reduce((b,a)=>a.pct>b.pct?a:b, mine[0]) : null;
+    let badge = `<span class="badge none">No Attempts</span>`;
+    if(best) badge = best.pct >= PASS_PCT ? `<span class="badge pass">Certified — ${best.pct}%</span>` : `<span class="badge fail">Not Certified — best ${best.pct}%</span>`;
+    grid.innerHTML += `
+      <div class="examTile">
+        ${badge}
+        <h3>${ex.label}</h3>
+        <p>${ex.desc}</p>
+        <div class="row">
+          <button class="btn orange small" onclick="startExam('${key}')">${best && best.pct>=PASS_PCT ? 'Retake Exam' : 'Start Exam'}</button>
+          ${best && best.pct>=PASS_PCT ? `<button class="btn small" onclick="showCertFor('${key}', ${JSON.stringify(best).replace(/"/g,'&quot;')})">View Certificate</button>` : ''}
+        </div>
+      </div>`;
+  });
+
+  const tbody = document.querySelector('#myHistoryTable tbody');
+  const mine = myAttemptsCombined().slice().sort((a,b)=> new Date(b.ts)-new Date(a.ts));
+  tbody.innerHTML = mine.map((a,i)=>`
+    <tr>
+      <td>${EXAMS[a.exam] ? EXAMS[a.exam].label : a.exam}</td>
+      <td>#${a.attemptNum || (i+1)}</td>
+      <td>${a.pct}% (${a.correct}/${a.total})</td>
+      <td>${a.pct>=PASS_PCT ? '<b style="color:var(--green)">PASS</b>' : '<b style="color:var(--red)">FAIL</b>'}</td>
+      <td>${new Date(a.ts).toLocaleString()}</td>
+    </tr>`).join('');
+  document.getElementById('myHistoryEmpty').classList.toggle('hidden', mine.length>0);
+}
+
+/* ---------------- EXAM RUNNER ---------------- */
+function startExam(key){
+  currentExamKey = key;
+  currentAnswers = {};
+  const ex = EXAMS[key];
+  const qs = QUESTIONS[key];
+  document.getElementById('examTitle').textContent = ex.label + ' — Certification Exam';
+  document.getElementById('examSub').textContent = qs.length + ' questions · ' + PASS_PCT + '% required to pass';
+  const container = document.getElementById('examQuestions');
+  container.innerHTML = qs.map((q,i)=>`
+    <div class="qBlock">
+      <div class="qNum">Question ${i+1} of ${qs.length}</div>
+      <div class="qText">${q.q}</div>
+      ${q.opts.map((opt,oi)=>`
+        <label class="optRow" id="opt-${i}-${oi}" onclick="selectAnswer(${i},${oi})">
+          <input type="radio" name="q${i}" value="${oi}"> ${opt}
+        </label>`).join('')}
+    </div>`).join('');
+  updateExamProgress();
+  showView('exam');
+  window.scrollTo(0,0);
+}
+function selectAnswer(qi, oi){
+  currentAnswers[qi] = oi;
+  document.querySelectorAll(`[id^="opt-${qi}-"]`).forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  updateExamProgress();
+}
+function updateExamProgress(){
+  const total = QUESTIONS[currentExamKey].length;
+  const answered = Object.keys(currentAnswers).length;
+  document.getElementById('examProgress').style.width = (answered/total*100)+'%';
+  document.getElementById('examProgressLbl').textContent = answered+' / '+total+' answered';
+}
+function submitExam(){
+  const qs = QUESTIONS[currentExamKey];
+  const total = qs.length;
+  const answered = Object.keys(currentAnswers).length;
+  if(answered < total){
+    const warn = document.getElementById('examWarn');
+    warn.textContent = (total-answered)+' question(s) still unanswered. Please answer every question before submitting.';
+    warn.classList.remove('hidden');
+    return;
+  }
+  let correct = 0;
+  qs.forEach((q,i)=>{ if(currentAnswers[i]===q.a) correct++; });
+  const pct = Math.round((correct/total)*100);
+  const priorAttempts = myAttemptsCombined().filter(a=>a.exam===currentExamKey).length;
+  const record = {
+    username: currentUser.username, name: currentUser.name, exam: currentExamKey,
+    correct, total, pct, attemptNum: priorAttempts+1, ts: new Date().toISOString()
+  };
+  localAttempts.push(record);
+  localStorage.setItem('nccb_cert_attempts_v1', JSON.stringify(localAttempts));
+  lastResult = record;
+  syncAttempt(record);
+  renderResults(record);
+}
+function renderResults(r){
+  const ex = EXAMS[r.exam];
+  document.getElementById('resultsTitle').textContent = ex.label + ' — Results';
+  const circle = document.getElementById('scoreCircle');
+  circle.className = 'scoreCircle ' + (r.pct>=PASS_PCT?'pass':'fail');
+  document.getElementById('scorePct').textContent = r.pct+'%';
+  document.getElementById('scoreLbl').textContent = r.correct+' / '+r.total+' correct';
+  document.getElementById('resultVerdict').textContent = r.pct>=PASS_PCT ? 'Passed — Certified' : 'Not Passed';
+  document.getElementById('resultVerdict').style.color = r.pct>=PASS_PCT ? 'var(--green)' : 'var(--red)';
+  document.getElementById('resultDetail').textContent = r.pct>=PASS_PCT
+    ? 'Congratulations — you have met the '+PASS_PCT+'% certification requirement for the '+ex.label+' exam.'
+    : 'A score of '+PASS_PCT+'% or higher is required to certify. You may retake this exam.';
+  document.getElementById('viewCertBtn').classList.toggle('hidden', r.pct<PASS_PCT);
+  document.getElementById('retakeBtn').classList.toggle('hidden', r.pct>=PASS_PCT);
+  showView('results');
+}
+function retakeExam(){ startExam(currentExamKey); }
+
+/* ---------------- CERTIFICATE ---------------- */
+function openCertificate(){ drawCertificate(lastResult); showView('cert'); }
+function showCertFor(examKey, record){ drawCertificate(record); showView('cert'); }
+function drawCertificate(r){
+  const ex = EXAMS[r.exam];
+  const c = document.getElementById('certCanvas');
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  // background
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,c.width,c.height);
+  ctx.strokeStyle = '#E8720C'; ctx.lineWidth = 14; ctx.strokeRect(20,20,c.width-40,c.height-40);
+  ctx.strokeStyle = '#12233B'; ctx.lineWidth = 3; ctx.strokeRect(42,42,c.width-84,c.height-84);
+  // header
+  ctx.fillStyle = '#12233B'; ctx.textAlign = 'center';
+  ctx.font = 'bold 26px Verdana'; ctx.fillText('NCCB CREDIT', c.width/2, 130);
+  ctx.font = '16px Verdana'; ctx.fillStyle = '#5B6472'; ctx.fillText('Specialist Certification Portal', c.width/2, 158);
+  ctx.font = 'bold 44px Georgia'; ctx.fillStyle = '#12233B'; ctx.fillText('Certificate of Completion', c.width/2, 250);
+  ctx.font = '18px Verdana'; ctx.fillStyle = '#5B6472'; ctx.fillText('This certifies that', c.width/2, 320);
+  ctx.font = 'bold 40px Georgia'; ctx.fillStyle = '#E8720C'; ctx.fillText(r.name, c.width/2, 385);
+  ctx.font = '18px Verdana'; ctx.fillStyle = '#5B6472';
+  ctx.fillText('has successfully completed the', c.width/2, 430);
+  ctx.font = 'bold 28px Georgia'; ctx.fillStyle = '#12233B';
+  ctx.fillText(ex.label + ' Certification Exam', c.width/2, 470);
+  ctx.font = '18px Verdana'; ctx.fillStyle = '#5B6472';
+  ctx.fillText('with a score of ' + r.pct + '% (' + r.correct + ' of ' + r.total + ' correct)', c.width/2, 510);
+  // date + signature line
+  ctx.font = '15px Verdana'; ctx.fillStyle = '#5B6472';
+  const dt = new Date(r.ts);
+  ctx.fillText('Completed: ' + dt.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}), c.width/2, 570);
+  ctx.strokeStyle = '#12233B'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(c.width/2-160, 690); ctx.lineTo(c.width/2+160, 690); ctx.stroke();
+  ctx.font = 'bold 14px Verdana'; ctx.fillStyle = '#12233B';
+  ctx.fillText('Dickson Ewemade — Executive Management, NCCB Credit', c.width/2, 712);
+  ctx.font = '11px Verdana'; ctx.fillStyle = '#9aa1ab';
+  ctx.fillText('Certificate ID: NCCB-'+r.exam.toUpperCase()+'-'+r.username.replace(/[^A-Za-z0-9]/g,'')+'-'+dt.getTime(), c.width/2, 900);
+}
+function downloadCert(){
+  const c = document.getElementById('certCanvas');
+  const link = document.createElement('a');
+  link.download = 'NCCB_Certificate_'+(lastResult?lastResult.exam:currentExamKey)+'.png';
+  link.href = c.toDataURL('image/png');
+  link.click();
+}
+
+/* ---------------- GOOGLE SHEETS SYNC ---------------- */
+function backendConfigured(){
+  return CONFIG.WEBAPP_URL && !CONFIG.WEBAPP_URL.startsWith('PASTE_');
+}
+function syncAttempt(record){
+  const msgEl = document.getElementById('syncMsg');
+  if(!backendConfigured()){
+    msgEl.innerHTML = '<div class="msg warn">Offline demo mode — this result is only saved in this browser. Paste your Apps Script Web App URL into CONFIG.WEBAPP_URL to sync results to Google Sheets across all devices.</div>';
+    return;
+  }
+  fetch(CONFIG.WEBAPP_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action:'submitAttempt', record })
+  }).then(r=>r.json()).then(res=>{
+    if(!res || !res.ok){ msgEl.innerHTML = '<div class="msg warn">Result saved locally, but the Google Sheets sync reported an error.</div>'; }
+    else { msgEl.innerHTML = ''; }
+  }).catch(()=>{
+    msgEl.innerHTML = '<div class="msg warn">Result saved locally, but could not reach the Google Sheets backend (offline or URL not deployed yet).</div>';
+  });
+}
+function refreshAdminData(){
+  if(!backendConfigured()){
+    window.__adminCache = null;
+    renderAdmin();
+    return;
+  }
+  fetch(CONFIG.WEBAPP_URL + '?action=getAllResults')
+    .then(r=>r.json())
+    .then(res=>{
+      if(res && res.ok){ window.__adminCache = res.attempts || []; }
+      renderAdmin(); renderDashboard();
+    })
+    .catch(()=>{ renderAdmin(); });
+}
+
+/* ---------------- ADMIN DASHBOARD ---------------- */
+function allAttemptsSource(){ return window.__adminCache || localAttempts; }
+function renderAdmin(){
+  if(!currentUser || !currentUser.admin) return;
+  const source = allAttemptsSource();
+  const examFilter = document.getElementById('fltExam').value;
+  const statusFilter = document.getElementById('fltStatus').value;
+  const nameFilter = (document.getElementById('fltName').value||'').toLowerCase();
+
+  // build per-employee-per-exam summary
+  let rows = [];
+  EMPLOYEES.forEach(emp=>{
+    emp.access.forEach(examKey=>{
+      const mine = source.filter(a=>a.username===emp.username && a.exam===examKey);
+      const best = mine.length ? mine.reduce((b,a)=>a.pct>b.pct?a:b, mine[0]) : null;
+      const last = mine.length ? mine.slice().sort((a,b)=>new Date(b.ts)-new Date(a.ts))[0] : null;
+      const status = !mine.length ? 'none' : (best.pct>=PASS_PCT ? 'pass' : 'fail');
+      rows.push({ emp, examKey, best, attempts: mine.length, status, last });
+    });
+  });
+  rows = rows.filter(r=>{
+    if(examFilter && r.examKey!==examFilter) return false;
+    if(statusFilter && r.status!==statusFilter) return false;
+    if(nameFilter && !r.emp.name.toLowerCase().includes(nameFilter)) return false;
+    return true;
+  });
+
+  const statTiles = document.getElementById('adminStats');
+  const totalCert = rows.filter(r=>r.status==='pass').length;
+  const totalAttemptsAll = source.length;
+  const totalPending = rows.filter(r=>r.status!=='pass').length;
+  statTiles.innerHTML = `
+    <div class="statTile"><div class="n">${EMPLOYEES.length}</div><div class="l">Employees</div></div>
+    <div class="statTile"><div class="n">${totalCert}</div><div class="l">Certifications Earned</div></div>
+    <div class="statTile"><div class="n">${totalPending}</div><div class="l">Not Yet Certified</div></div>
+    <div class="statTile"><div class="n">${totalAttemptsAll}</div><div class="l">Total Attempts Logged</div></div>
+  `;
+
+  const body = document.getElementById('adminTableBody');
+  body.innerHTML = rows.map(r=>{
+    const statusHtml = r.status==='pass' ? '<span class="badge pass">Certified</span>'
+                      : r.status==='fail' ? '<span class="badge fail">Not Certified</span>'
+                      : '<span class="badge none">No Attempt</span>';
+    return `<tr>
+      <td>${r.emp.name}</td>
+      <td>${r.emp.username}</td>
+      <td>${EXAMS[r.examKey].label}</td>
+      <td>${r.best ? r.best.pct+'%' : '—'}</td>
+      <td>${r.attempts}</td>
+      <td>${statusHtml}</td>
+      <td>${r.last ? new Date(r.last.ts).toLocaleDateString() : '—'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('adminEmpty').classList.toggle('hidden', rows.length>0);
+
+  const logBody = document.getElementById('adminLogBody');
+  const log = source.slice().sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+  logBody.innerHTML = log.map((a,i)=>`
+    <tr>
+      <td>${log.length-i}</td>
+      <td>${a.name||a.username}</td>
+      <td>${EXAMS[a.exam]?EXAMS[a.exam].label:a.exam}</td>
+      <td>${a.pct}% (${a.correct}/${a.total})</td>
+      <td>${a.pct>=PASS_PCT?'<b style="color:var(--green)">PASS</b>':'<b style="color:var(--red)">FAIL</b>'}</td>
+      <td>${new Date(a.ts).toLocaleString()}</td>
+    </tr>`).join('');
+}
+</script>
+</body>
+</html>
