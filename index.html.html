@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCCB Credit — Specialist Certification Portal</title>
+<style>
+  :root{
+    --orange:#E8720C;
+    --orange-dark:#C25A00;
+    --navy:#12233B;
+    --navy2:#1B3358;
+    --grey:#5B6472;
+    --ltgrey:#F4F5F7;
+    --border:#E1E4E9;
+    --green:#1E8E4F;
+    --red:#D0342C;
+    --white:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Verdana,Arial,sans-serif; background:var(--ltgrey); color:var(--navy);
+    min-height:100vh;
+  }
+  header.topbar{
+    background:var(--navy); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between;
+    box-shadow:0 2px 6px rgba(0,0,0,.15);
+  }
+  header.topbar .brand{display:flex; align-items:center; gap:10px; font-weight:bold; font-size:18px;}
+  header.topbar .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--orange);}
+  header.topbar .who{font-size:13px; display:flex; align-items:center; gap:14px;}
+  header.topbar button{
+    background:var(--orange); color:#fff; border:none; padding:8px 14px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:12px;
+  }
+  header.topbar button:hover{background:var(--orange-dark);}
+  .wrap{max-width:1100px; margin:0 auto; padding:26px 18px 60px;}
+  .card{background:#fff; border:1px solid var(--border); border-radius:8px; padding:22px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .card h2{margin-top:0; color:var(--navy); border-bottom:3px solid var(--orange); padding-bottom:8px; font-size:19px;}
+  .card h3{color:var(--navy2); font-size:15px;}
+  a{color:var(--orange-dark);}
+  /* ---------- login ---------- */
+  #loginScreen{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column;
+    background:linear-gradient(135deg,var(--navy) 0%, var(--navy2) 60%, var(--orange-dark) 130%);
+  }
+  .loginBox{
+    background:#fff; width:100%; max-width:380px; border-radius:10px; padding:34px 30px; box-shadow:0 10px 40px rgba(0,0,0,.35);
+  }
+  .loginBox .dot{width:14px;height:14px;border-radius:50%;background:var(--orange); display:inline-block; margin-right:8px;}
+  .loginBox h1{font-size:19px; margin:0 0 4px; color:var(--navy);}
+  .loginBox p.sub{color:var(--grey); font-size:12.5px; margin:0 0 22px;}
+  .loginBox label{display:block; font-size:12px; font-weight:bold; color:var(--navy2); margin:14px 0 5px;}
+  .loginBox input, .loginBox select{
+    width:100%; padding:10px 11px; border:1px solid var(--border); border-radius:5px; font-size:14px; font-family:inherit;
+  }
+  .loginBox button.go{
+    width:100%; margin-top:20px; background:var(--orange); color:#fff; border:none; padding:12px; border-radius:6px;
+    font-weight:bold; font-size:14px; cursor:pointer;
+  }
+  .loginBox button.go:hover{background:var(--orange-dark);}
+  .loginErr{color:var(--red); font-size:12.5px; margin-top:10px; display:none; font-weight:bold;}
+  .loginBox .foot{text-align:center; font-size:11px; color:#9aa1ab; margin-top:18px;}
+  /* ---------- dashboard tiles ---------- */
+  .examGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;}
+  .examTile{
+    border:1px solid var(--border); border-radius:8px; padding:18px; background:#fbfbfc; position:relative;
+    border-top:4px solid var(--orange);
+  }
+  .examTile h3{margin:0 0 6px;}
+  .examTile p{font-size:12.5px; color:var(--grey); margin:4px 0 14px;}
+  .badge{display:inline-block; font-size:11px; font-weight:bold; padding:3px 9px; border-radius:20px; margin-bottom:6px;}
+  .badge.pass{background:#E4F5EA; color:var(--green);}
+  .badge.fail{background:#FBE9E7; color:var(--red);}
+  .badge.none{background:#EDEFF2; color:var(--grey);}
+  .btn{
+    display:inline-block; background:var(--navy); color:#fff; border:none; padding:9px 16px; border-radius:5px;
+    font-size:12.5px; font-weight:bold; cursor:pointer; text-decoration:none;
+  }
+  .btn:hover{background:var(--navy2);}
+  .btn.orange{background:var(--orange);}
+  .btn.orange:hover{background:var(--orange-dark);}
+  .btn.small{padding:6px 11px; font-size:11.5px;}
+  .btn[disabled]{opacity:.45; cursor:not-allowed;}
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  table th{background:var(--navy); color:#fff; text-align:left; padding:9px 10px;}
+  table td{padding:8px 10px; border-bottom:1px solid var(--border);}
+  table tr:nth-child(even) td{background:#FAFAFB;}
+  /* ---------- exam runner ---------- */
+  .examHeaderBar{
+    position:sticky; top:0; background:#fff; border-bottom:2px solid var(--orange); padding:12px 18px;
+    display:flex; justify-content:space-between; align-items:center; z-index:5; margin:-22px -22px 20px;
+  }
+  .progressOuter{background:var(--border); border-radius:10px; height:8px; width:220px; overflow:hidden;}
+  .progressInner{background:var(--orange); height:100%; width:0%; transition:width .2s;}
+  .qBlock{border-bottom:1px solid var(--border); padding:16px 0;}
+  .qBlock:last-child{border-bottom:none;}
+  .qNum{color:var(--orange-dark); font-weight:bold; font-size:12px;}
+  .qText{font-weight:bold; margin:4px 0 10px; font-size:14px;}
+  .optRow{display:block; padding:8px 10px; border:1px solid var(--border); border-radius:5px; margin-bottom:7px; cursor:pointer; font-size:13px;}
+  .optRow:hover{background:#FFF4EA;}
+  .optRow input{margin-right:8px;}
+  .optRow.selected{border-color:var(--orange); background:#FFF4EA;}
+  /* ---------- results ---------- */
+  .scoreCircle{
+    width:150px; height:150px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; margin:0 auto 16px; border:10px solid var(--border);
+  }
+  .scoreCircle.pass{border-color:var(--green);}
+  .scoreCircle.fail{border-color:var(--red);}
+  .scoreCircle .pct{font-size:32px; font-weight:bold; color:var(--navy);}
+  .scoreCircle .lbl{font-size:11px; color:var(--grey);}
+  /* ---------- certificate ---------- */
+  #certCanvasWrap{display:flex; justify-content:center; margin:14px 0;}
+  canvas#certCanvas{max-width:100%; border:1px solid var(--border); box-shadow:0 2px 10px rgba(0,0,0,.1);}
+  /* misc */
+  .row{display:flex; gap:14px; flex-wrap:wrap; align-items:center;}
+  .msg{padding:10px 14px; border-radius:6px; font-size:12.5px; margin-bottom:14px;}
+  .msg.info{background:#EAF1FB; color:var(--navy2);}
+  .msg.warn{background:#FFF4E5; color:#8A5300;}
+  .hidden{display:none !important;}
+  .navTabs{display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap;}
+  .navTabs button{
+    background:#fff; border:1px solid var(--border); padding:9px 15px; border-radius:6px 6px 0 0; cursor:pointer; font-size:12.5px; font-weight:bold; color:var(--grey);
+  }
+  .navTabs button.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+  .filterRow{display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+  .filterRow select, .filterRow input{padding:7px 10px; border:1px solid var(--border); border-radius:5px; font-size:12.5px;}
+  .statTiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:18px;}
+  .statTile{background:#fff; border:1px solid var(--border); border-left:4px solid var(--orange); border-radius:6px; padding:12px 14px;}
+  .statTile .n{font-size:22px; font-weight:bold; color:var(--navy);}
+  .statTile .l{font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:.3px;}
+  footer.foot{text-align:center; font-size:11px; color:#9aa1ab; padding:20px 0;}
+  .emailBox{
+    max-width:420px; margin:14px auto 0; background:#FBFBFC; border:1px solid var(--border); border-radius:8px; padding:14px 16px;
+  }
+  .emailBox label{display:block; font-size:11.5px; font-weight:bold; color:var(--navy2); margin-bottom:6px;}
+  .emailBox input{width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:5px; font-size:13px; margin-bottom:10px; font-family:inherit;}
+  .emailBox .btn{margin-right:6px;}
+  .emailBox .msgline{font-size:12px; margin-top:8px;}
+  .emailBox .msgline.ok{color:var(--green);}
+  .emailBox .msgline.err{color:var(--red);}
+  @media print{
+    body *{visibility:hidden;}
+    .certPrintTarget, .certPrintTarget *{visibility:visible;}
+    .certPrintTarget{position:absolute; left:0; top:0; width:100%; margin:0; box-shadow:none; border:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ LOGIN ============================================================ -->
+<div id="loginScreen">
+  <div class="loginBox">
+    <h1><span class="dot"></span>NCCB Specialist Certification Portal</h1>
+    <p class="sub">Sign in with your NCCB Credit employee username and PIN.</p>
+    <label>Username</label>
+    <input id="loginUser" type="text" placeholder="e.g. Jessenia.L1" autocomplete="off">
+    <label>PIN</label>
+    <input id="loginPin" type="password" placeholder="4-digit PIN" maxlength="6" autocomplete="off">
+    <button class="go" onclick="doLogin()">Sign In</button>
+    <div class="loginErr" id="loginErr">Invalid username or PIN.</div>
+    <div class="foot">NCCB Credit &middot; Internal use only</div>
+  </div>
+</div>
+
+<!-- ============================================================ APP ============================================================ -->
+<div id="appScreen" class="hidden">
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span>NCCB Specialist Certification Portal</div>
+    <div class="who">
+      <span id="whoLabel"></span>
+      <button onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="syncMsg"></div>
+
+    <div class="navTabs" id="navTabs"></div>
+
+    <!-- ---------- DASHBOARD VIEW ---------- -->
+    <div id="view-dashboard">
+      <div class="card">
+        <h2>Your Certification Exams</h2>
+        <div class="examGrid" id="examGrid"></div>
+      </div>
+      <div class="card" id="myHistoryCard">
+        <h2>My Attempt History</h2>
+        <table id="myHistoryTable">
+          <thead><tr><th>Exam</th><th>Attempt</th><th>Score</th><th>Result</th><th>Date</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div id="myHistoryEmpty" class="msg info hidden">No attempts recorded yet. Choose an exam above to begin.</div>
+      </div>
+    </div>
+
+    <!-- ---------- EXAM VIEW ---------- -->
+    <div id="view-exam" class="hidden">
+      <div class="card" style="padding-top:0;">
+        <div class="examHeaderBar">
+          <div>
+            <strong id="examTitle">Exam</strong><br>
+            <span style="font-size:11.5px;color:var(--grey);" id="examSub">90 questions &middot; 80% required to pass</span>
+          </div>
+          <div class="row">
+            <div class="progressOuter"><div class="progressInner" id="examProgress"></div></div>
+            <span id="examProgressLbl" style="font-size:12px;color:var(--grey);">0 / 90 answered</span>
+          </div>
+        </div>
+        <div id="examQuestions"></div>
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn orange" onclick="submitExam()" style="padding:12px 30px; font-size:14px;">Submit Exam</button>
+          <div id="examWarn" class="msg warn hidden" style="max-width:400px;margin:14px auto 0;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- RESULTS VIEW ---------- -->
+    <div id="view-results" class="hidden">
+      <div class="card" style="text-align:center;">
+        <h2 style="border:none; text-align:left;" id="resultsTitle">Exam Results</h2>
+        <div class="scoreCircle" id="scoreCircle">
+          <div class="pct" id="scorePct">0%</div>
+          <div class="lbl" id="scoreLbl">SCORE</div>
+        </div>
+        <h3 id="resultVerdict"></h3>
+        <p id="resultDetail" style="color:var(--grey); font-size:13px;"></p>
+        <div class="row" style="justify-content:center;">
+          <button class="btn" onclick="showView('dashboard')">Back to Dashboard</button>
+          <button class="btn orange hidden" id="viewCertBtn" onclick="openCertificate()">View / Download Certificate</button>
+          <button class="btn hidden" id="retakeBtn" onclick="retakeExam()">Retake Exam</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- CERTIFICATE VIEW ---------- -->
+    <div id="view-cert" class="hidden">
+      <div class="card">
+        <h2>Certificate of Completion</h2>
+        <div id="certCanvasWrap" class="certPrintTarget"><canvas id="certCanvas" width="1400" height="990"></canvas></div>
+        <div class="row" style="justify-content:center;">
+          <button class="btn orange" onclick="downloadCert()">Download Certificate (PNG)</button>
+          <button class="btn" onclick="window.print()">Print / Save as PDF</button>
+          <button class="btn" onclick="toggleEmailBox('cert')">Email Certificate to Rep</button>
+          <button class="btn" onclick="showView('dashboard')">Back to Dashboard</button>
+        </div>
+        <div id="emailBox-cert" class="emailBox hidden">
+          <label>Send certificate to:</label>
+          <input type="email" id="emailAddr-cert" placeholder="rep@nccbcredit.com">
+          <button class="btn small orange" onclick="sendCertificateEmail('cert')">Send</button>
+          <button class="btn small" onclick="toggleEmailBox('cert')">Cancel</button>
+          <div id="emailMsg-cert"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- ADMIN VIEW ---------- -->
+    <div id="view-admin" class="hidden">
+      <div class="navTabs" id="adminSubTabs">
+        <button data-av="results" onclick="showAdminSub('results')" class="active">Results Dashboard</button>
+        <button data-av="answerkey" onclick="showAdminSub('answerkey')">Answer Key</button>
+        <button data-av="award" onclick="showAdminSub('award')">Award Certification</button>
+      </div>
+
+      <!-- Results Dashboard sub-view -->
+      <div id="admin-sub-results">
+        <div class="card">
+          <h2>Administrator Results Dashboard</h2>
+          <div class="statTiles" id="adminStats"></div>
+          <div class="filterRow">
+            <select id="fltExam"><option value="">All Exams</option><option value="dms">Debt Management Specialist</option><option value="ccs">Credit Counselor Specialist</option></select>
+            <select id="fltStatus"><option value="">All Statuses</option><option value="pass">Certified (Pass)</option><option value="fail">Not Yet Certified</option><option value="none">No Attempt</option></select>
+            <input id="fltName" type="text" placeholder="Search employee...">
+            <button class="btn small" onclick="renderAdmin()">Apply Filters</button>
+            <button class="btn small orange" onclick="refreshAdminData()">Refresh Data</button>
+          </div>
+          <table>
+            <thead><tr><th>Employee</th><th>Username</th><th>Exam</th><th>Best Score</th><th>Attempts</th><th>Status</th><th>Last Completed</th></tr></thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+          <div id="adminEmpty" class="msg info hidden">No attempt data yet, or backend not configured — see setup note in Code.gs.</div>
+        </div>
+        <div class="card">
+          <h2>Full Attempt Log</h2>
+          <table>
+            <thead><tr><th>#</th><th>Employee</th><th>Exam</th><th>Score</th><th>Result</th><th>Timestamp</th></tr></thead>
+            <tbody id="adminLogBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Answer Key sub-view -->
+      <div id="admin-sub-answerkey" class="hidden">
+        <div class="card">
+          <h2>Answer Key — Administrators Only</h2>
+          <div class="msg warn">This reference sheet shows the correct answer for every exam question. Visible to Administrator logins only — do not share with reps.</div>
+          <div class="filterRow">
+            <select id="akExam" onchange="renderAnswerKey()">
+              <option value="dms">Debt Management Specialist (90 Questions)</option>
+              <option value="ccs">Credit Counselor Specialist (90 Questions)</option>
+            </select>
+            <button class="btn small" onclick="window.print()">Print / Save as PDF</button>
+          </div>
+          <div id="answerKeyBody"></div>
+        </div>
+      </div>
+
+      <!-- Award Certification sub-view -->
+      <div id="admin-sub-award" class="hidden">
+        <div class="card">
+          <h2>Award Certification to a Rep</h2>
+          <p style="font-size:12.5px;color:var(--grey);">Use this to manually certify a rep (e.g. for an in-person or proctored exam, a make-up, or a legacy record) without them logging in themselves. This creates a real attempt record — synced to the Attempts sheet — and generates their certificate immediately below.</p>
+          <div class="filterRow" style="align-items:flex-end;">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:bold;color:var(--navy2);margin-bottom:4px;">Rep / Employee</label>
+              <select id="awardUser" style="min-width:220px;"></select>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:bold;color:var(--navy2);margin-bottom:4px;">Exam</label>
+              <select id="awardExam" style="min-width:220px;"></select>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:bold;color:var(--navy2);margin-bottom:4px;">Score (%)</label>
+              <input id="awardScore" type="number" min="0" max="100" value="100" style="width:90px;">
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:bold;color:var(--navy2);margin-bottom:4px;">Award Date</label>
+              <input id="awardDate" type="date">
+            </div>
+            <button class="btn orange" onclick="submitAward()">Generate &amp; Award Certificate</button>
+          </div>
+          <div id="awardMsg"></div>
+        </div>
+        <div class="card hidden" id="awardCertCard">
+          <h2>Certificate Preview</h2>
+          <div id="certCanvasWrapAdmin" class="certPrintTarget" style="display:flex;justify-content:center;margin:14px 0;">
+            <canvas id="certCanvasAdmin" width="1400" height="990" style="max-width:100%;border:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.1);"></canvas>
+          </div>
+          <div class="row" style="justify-content:center;">
+            <button class="btn orange" onclick="downloadAdminCert()">Download Certificate (PNG)</button>
+            <button class="btn" onclick="window.print()">Print / Save as PDF</button>
+            <button class="btn" onclick="toggleEmailBox('award')">Email Certificate to Rep</button>
+          </div>
+          <div id="emailBox-award" class="emailBox hidden">
+            <label>Send certificate to:</label>
+            <input type="email" id="emailAddr-award" placeholder="rep@nccbcredit.com">
+            <button class="btn small orange" onclick="sendCertificateEmail('award')">Send</button>
+            <button class="btn small" onclick="toggleEmailBox('award')">Cancel</button>
+            <div id="emailMsg-award"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <footer class="foot">NCCB Credit &middot; Specialist Certification Portal &middot; internal training use only</footer>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — the only thing you need to edit.
+   Paste your deployed Google Apps Script Web App URL below once
+   you've set up Code.gs (see SETUP.md). Leave as-is to run in
+   local/offline demo mode (data will not sync across devices).
+   ============================================================ */
+const CONFIG = {
+  WEBAPP_URL: 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'
+};
+
+/* ============================================================
+   EMPLOYEES — from README credential table.
+   role: 'admin' sees Administrator dashboard + both exams.
+         'dms' sees only the Debt Management Specialist exam.
+         'ccs' sees only the Credit Counselor Specialist exam.
+   ============================================================ */
+const EMPLOYEES = [
+  { username:'Shaquile.H1',  pin:'4827', name:'Shaquile',  access:['dms'] },
+  { username:'Rogelio.L1',   pin:'6153', name:'Rogelio',   access:['ccs'] },
+  { username:'Jessenia.L1',  pin:'2948', name:'Jessenia',  access:['dms','ccs'], admin:true },
+  { username:'Alexia.R1',    pin:'7316', name:'Alexia',    access:['dms','ccs'], admin:true },
+  { username:'Lawrence.H1',  pin:'8562', name:'Lawrence',  access:['dms','ccs'], admin:true },
+    { username:'Rep200', pin:'1200', name:'Rep 200', access:['dms','ccs'] },
+  { username:'Rep201', pin:'1201', name:'Rep 201', access:['dms','ccs'] },
+  { username:'Rep202', pin:'1202', name:'Rep 202', access:['dms','ccs'] },
+  { username:'Rep203', pin:'1203', name:'Rep 203', access:['dms','ccs'] },
+  { username:'Rep204', pin:'1204', name:'Rep 204', access:['dms','ccs'] },
+  { username:'Rep205', pin:'1205', name:'Rep 205', access:['dms','ccs'] },
+  { username:'Rep206', pin:'1206', name:'Rep 206', access:['dms','ccs'] },
+  { username:'Rep207', pin:'1207', name:'Rep 207', access:['dms','ccs'] },
+  { username:'Rep208', pin:'1208', name:'Rep 208', access:['dms','ccs'] },
+  { username:'Rep209', pin:'1209', name:'Rep 209', access:['dms','ccs'] },
+  { username:'Rep210', pin:'1210', name:'Rep 210', access:['dms','ccs'] },
+  { username:'Rep211', pin:'1211', name:'Rep 211', access:['dms','ccs'] },
+  { username:'Rep212', pin:'1212', name:'Rep 212', access:['dms','ccs'] },
+  { username:'Rep213', pin:'1213', name:'Rep 213', access:['dms','ccs'] },
+  { username:'Rep214', pin:'1214', name:'Rep 214', access:['dms','ccs'] },
+  { username:'Rep215', pin:'1215', name:'Rep 215', access:['dms','ccs'] },
+  { username:'Rep216', pin:'1216', name:'Rep 216', access:['dms','ccs'] },
+  { username:'Rep217', pin:'1217', name:'Rep 217', access:['dms','ccs'] },
+  { username:'Rep218', pin:'1218', name:'Rep 218', access:['dms','ccs'] },
+  { username:'Rep219', pin:'1219', name:'Rep 219', access:['dms','ccs'] },
+  { username:'Rep220', pin:'1220', name:'Rep 220', access:['dms','ccs'] },
+  { username:'Rep221', pin:'1221', name:'Rep 221', access:['dms','ccs'] },
+  { username:'Rep222', pin:'1222', name:'Rep 222', access:['dms','ccs'] },
+  { username:'Rep223', pin:'1223', name:'Rep 223', access:['dms','ccs'] },
+  { username:'Rep224', pin:'1224', name:'Rep 224', access:['dms','ccs'] },
+  { username:'Rep225', pin:'1225', name:'Rep 225', access:['dms','ccs'] },
+  { username:'Rep226', pin:'1226', name:'Rep 226', access:['dms','ccs'] },
+  { username:'Rep227', pin:'1227', name:'Rep 227', access:['dms','ccs'] },
+  { username:'Rep228', pin:'1228', name:'Rep 228', access:['dms','ccs'] },
+  { username:'Rep229', pin:'1229', name:'Rep 229', access:['dms','ccs'] },
+  { username:'Rep230', pin:'1230', name:'Rep 230', access:['dms','ccs'] },
+  { username:'Rep231', pin:'1231', name:'Rep 231', access:['dms','ccs'] },
+  { username:'Rep232', pin:'1232', name:'Rep 232', access:['dms','ccs'] },
+  { username:'Rep233', pin:'1233', name:'Rep 233', access:['dms','ccs'] },
+  { username:'Rep234', pin:'1234', name:'Rep 234', access:['dms','ccs'] },
+  { username:'Rep235', pin:'1235', name:'Rep 235', access:['dms','ccs'] },
+  { username:'Rep236', pin:'1236', name:'Rep 236', access:['dms','ccs'] },
+  { username:'Rep237', pin:'1237', name:'Rep 237', access:['dms','ccs'] },
+  { username:'Rep238', pin:'1238', name:'Rep 238', access:['dms','ccs'] },
+  { username:'Rep239', pin:'1239', name:'Rep 239', access:['dms','ccs'] },
+  { username:'Rep240', pin:'1240', name:'Rep 240', access:['dms','ccs'] },
+  { username:'Rep241', pin:'1241', name:'Rep 241', access:['dms','ccs'] },
+  { username:'Rep242', pin:'1242', name:'Rep 242', access:['dms','ccs'] },
+  { username:'Rep243', pin:'1243', name:'Rep 243', access:['dms','ccs'] },
+  { username:'Rep244', pin:'1244', name:'Rep 244', access:['dms','ccs'] },
+  { username:'Rep245', pin:'1245', name:'Rep 245', access:['dms','ccs'] },
+  { username:'Rep246', pin:'1246', name:'Rep 246', access:['dms','ccs'] },
+  { username:'Rep247', pin:'1247', name:'Rep 247', access:['dms','ccs'] },
+  { username:'Rep248', pin:'1248', name:'Rep 248', access:['dms','ccs'] },
+  { username:'Rep249', pin:'1249', name:'Rep 249', access:['dms','ccs'] },
+  { username:'Rep250', pin:'1250', name:'Rep 250', access:['dms','ccs'] },
+];
+
+const EXAMS = {
+  dms: { key:'dms', label:'Debt Management Specialist', short:'DMS', desc:'Covers OCCC compliance, the NCCB fee schedule, DMP vs. Debt Settlement, FDCPA/TCPA, and required documentation standards.' },
+  ccs: { key:'ccs', label:'Credit Counselor Specialist', short:'CCS', desc:'Covers FCRA, credit scoring factors, credit restoration workflow, My800Scores, and compliant client counseling practices.' }
+};
+
+const QUESTIONS = {"dms":[{"q":"NCCB Credit is licensed in Texas under which regulatory framework?","opts":["Texas OCCC Chapter 394 (Debt Management Organizations)","Texas Finance Code Chapter 342 (Consumer Loans)","Texas Insurance Code Chapter 4001","Texas Business Organizations Code Chapter 21"],"a":0,"exp":"NCCB Credit is a Texas OCCC Chapter 394 licensed debt management organization."},{"q":"What is the correct order in which NCCB fees must be disclosed and sequenced with a new Debt Management client?","opts":["My800Scores $39.99/mo, then Credit Counseling $175.95, then Debt Management $559 retainer + 10%","Debt Management retainer first, then My800Scores, then Credit Counseling","All fees are disclosed and charged simultaneously at enrollment","Credit Counseling fee only; My800Scores and Debt Management fees are optional add-ons"],"a":0,"exp":"Current Service Advisory & Program Placement Guide v2 sequence: My800Scores $39.99/mo -> Credit Counseling $175.95 (no retainer) -> Debt Management $559 retainer + 10%."},{"q":"What is the current Debt Management program fee structure?","opts":["$559 retainer plus 10%","$140.95 flat fee only","$559 retainer plus 18%","No retainer, 15% of enrolled debt"],"a":0,"exp":""},{"q":"What is the current Debt Settlement program fee structure?","opts":["$559 retainer plus 18%","$559 retainer plus 10%","$175.95 flat, no retainer","$39.99/month only"],"a":0,"exp":""},{"q":"A prospect has $4,200 in unsecured debt and is asking about Debt Management enrollment. What should the specialist do?","opts":["Follow the program's minimum-debt gate and route the prospect to the appropriate alternative track if below threshold","Enroll them regardless of the amount since they asked","Tell them to call back when they have more debt","Automatically place them into Debt Settlement instead without disclosure"],"a":0,"exp":"NCCB intake logic applies a minimum-debt gate; prospects below the threshold are rerouted to an appropriate track (e.g., Credit Restoration or Financial Counseling) rather than force-enrolled."},{"q":"Which federal law primarily governs third-party debt collector conduct (harassment, false statements, unfair practices)?","opts":["Fair Debt Collection Practices Act (FDCPA)","Truth in Lending Act (TILA)","Fair Credit Reporting Act (FCRA)","Gramm-Leach-Bliley Act (GLBA)"],"a":0,"exp":""},{"q":"Which federal law governs unsolicited telemarketing calls, robocalls, and prior express written consent requirements?","opts":["Telephone Consumer Protection Act (TCPA)","CAN-SPAM Act","Dodd-Frank Act","RESPA"],"a":0,"exp":""},{"q":"On the NCCB intake form, why is a TCPA-compliant SMS opt-in required before texting a prospect?","opts":["Written/electronic consent is required before sending automated or marketing text messages under the TCPA","It is only a courtesy, not a legal requirement","It applies only to phone calls, not text messages","It is required by the OCCC, not the TCPA"],"a":0,"exp":""},{"q":"What does 'DMP' stand for in the debt management context?","opts":["Debt Management Plan","Direct Merchant Payment","Debt Mitigation Program","Delinquency Monitoring Process"],"a":0,"exp":""},{"q":"In a Debt Management Plan, who typically distributes the client's monthly payment to enrolled creditors?","opts":["The debt management organization (NCCB), via a trust/servicing account","The client pays each creditor directly","The creditor's collection agency","A third-party payroll processor"],"a":0,"exp":""},{"q":"What is a primary goal of a Debt Management Plan compared to Debt Settlement?","opts":["Paying creditors in full over time, often with reduced interest rates negotiated with creditors","Paying creditors a fraction of the balance and settling for less than owed","Discharging all debt through bankruptcy","Consolidating debt into a new secured loan"],"a":0,"exp":"DMPs generally aim to repay the full principal (often at reduced interest) versus Debt Settlement which negotiates a reduced payoff amount."},{"q":"What is a primary goal of Debt Settlement compared to a Debt Management Plan?","opts":["Negotiating a lump-sum or reduced payoff for less than the full balance owed","Paying every creditor 100% of the balance with no interest reduction","Automatically improving the client's credit score within 30 days","Consolidating all debts into one new unsecured loan"],"a":0,"exp":""},{"q":"A client on a Debt Management Plan asks why their credit score dipped after enrollment even though they are current. What is the most accurate explanation?","opts":["Accounts may be re-aged or noted as enrolled in a DMP, and utilization/account mix can shift scoring factors temporarily","DMP enrollment always improves credit score immediately","The credit bureaus penalize DMP clients permanently with no recovery possible","This should never happen and indicates a data error"],"a":0,"exp":""},{"q":"What should a Debt Management Specialist do if a client mentions they are considering filing for bankruptcy?","opts":["Refer per the Service Advisory Guide's BK Counseling referral protocol","Discourage bankruptcy and insist they stay enrolled regardless of their situation","Ignore the comment since it is outside the specialist's role","Immediately cancel the client's file without discussion"],"a":0,"exp":""},{"q":"Under NCCB's compliance standards, what must a specialist do before enrolling a client in any paid program?","opts":["Disclose all applicable fees in the correct sequence and confirm the client's understanding","Collect payment first, then explain fees afterward","Only disclose fees if the client specifically asks","Disclose fees verbally only, with no documentation required"],"a":0,"exp":""},{"q":"What is the purpose of documenting a call outcome status (e.g., N/A for No Answer) in the CRM?","opts":["To maintain accurate, auditable records of every contact attempt for compliance and follow-up","It is optional and only used for internal team competitions","To track specialist call volume for punitive purposes only","It has no compliance relevance"],"a":0,"exp":""},{"q":"What does the abbreviation 'N/VM' mean in NCCB shorthand call notes?","opts":["No Voicemail Left","New Voicemail","Not Verified/Missing","Number Verification Missed"],"a":0,"exp":""},{"q":"A client disputes a fee they were charged and says it was never disclosed. What is the correct first step?","opts":["Pull the documented disclosure record/call notes and escalate per the SOP escalation contacts if unresolved","Immediately refund the fee without reviewing any documentation","Tell the client the fee cannot be disputed under any circumstance","Ignore the dispute since verbal disclosures are not documented"],"a":0,"exp":""},{"q":"Per the NCCB Daily Workflow SOP, how long is the standard lunch block?","opts":["30 minutes","60 minutes","90 minutes","45 minutes"],"a":0,"exp":""},{"q":"Who is the issuing/escalation authority named in the NCCB Daily Workflow & Sales Floor Operations SOP?","opts":["Executive Management (Dickson Ewemade)","The individual specialist's direct peer","No named authority exists","The client's original referral source"],"a":0,"exp":""},{"q":"Which of the following is an unfair, deceptive, or abusive practice a specialist must avoid under UDAAP principles?","opts":["Misrepresenting the likely results or timeline of a debt program","Accurately disclosing all program fees","Documenting a client's stated goals","Confirming a client's contact information"],"a":0,"exp":""},{"q":"What is 'reaging' of a debt account, and why does it matter to a Debt Management Specialist?","opts":["Illegally resetting the statute of limitations or delinquency clock on old debt, which specialists must never facilitate or misrepresent","A standard, encouraged practice to help clients look more current on paper","A synonym for debt settlement","A required step in every DMP enrollment"],"a":0,"exp":""},{"q":"A prospect asks, 'Is my payment history reported to the credit bureaus while on a DMP?' What is the most accurate answer?","opts":["Yes, creditors generally continue reporting payment activity, which can positively reflect consistent on-time payments over time","No, DMP payments are never reported under any circumstances","Only if the client pays in cash","Reporting stops entirely the day of enrollment"],"a":0,"exp":""},{"q":"What should a specialist do if a client becomes upset and requests to speak with a supervisor?","opts":["Follow the SOP escalation process and connect the client appropriately","Refuse the request and continue the call as normal","Hang up the call","Tell the client no supervisor is available under any circumstance"],"a":0,"exp":""},{"q":"Which of these is considered a compliance-relevant CRM/documentation standard at NCCB?","opts":["Every contact attempt, including a zero-activity day, must be logged as a complete submission","Only successful sales need to be logged","Notes are optional if the specialist remembers the call","Documentation standards apply only to management, not specialists"],"a":0,"exp":""},{"q":"What does 'ECOA' stand for, and why is it relevant to debt program communications?","opts":["Equal Credit Opportunity Act \u2014 prohibits discrimination in credit-related communications and decisions","Electronic Consumer Outreach Act \u2014 governs email marketing only","Enrollment Certification and Oversight Act \u2014 an internal NCCB policy","Estimated Cost of Account \u2014 a fee disclosure term"],"a":0,"exp":""},{"q":"A client's creditor refuses to accept reduced interest concessions through the DMP. What is an appropriate next step?","opts":["Document the refusal, inform the client transparently, and continue servicing the plan per policy","Tell the client the entire DMP has failed and cancel immediately","Hide the refusal from the client","Guarantee the client the creditor will eventually agree"],"a":0,"exp":""},{"q":"What is the purpose of the 'no-commitment' disclosure often included in loan/program submission documents?","opts":["To clarify that submitting an application or inquiry does not guarantee approval or enrollment","To waive the client's right to cancel","To commit the client to a binding contract immediately","It has no legal purpose and is boilerplate only"],"a":0,"exp":""},{"q":"Which of the following best describes 'AML/BSA' compliance relevance in a debt/finance intake context?","opts":["Anti-Money Laundering / Bank Secrecy Act considerations around verifying client identity and monitoring for suspicious financial activity","A marketing acronym with no compliance meaning","A tax filing requirement only","A credit scoring model"],"a":0,"exp":""},{"q":"A specialist is unsure whether a client qualifies for Debt Management versus Credit Restoration. What is the correct resource to consult?","opts":["The Service Advisory & Program Placement Guide","Personal judgment only, without documentation","The client's social media profile","None \u2014 placement decisions are made by clients only"],"a":0,"exp":""},{"q":"What is the primary difference between a 'live transfer' lead and an emailed lead for a Debt Management Specialist?","opts":["A live transfer connects the specialist to the prospect in real time; an emailed lead requires outbound follow-up","There is no difference in handling","Live transfers never require documentation","Emailed leads are always higher priority"],"a":0,"exp":""},{"q":"Why is it important to confirm a client's total enrolled debt amount before quoting a projected program timeline?","opts":["Program length and payment estimates are directly tied to accurate debt and budget figures","Timelines are fixed regardless of debt amount","Debt amount has no bearing on projected timelines","Only the number of creditors matters, not the balance"],"a":0,"exp":""},{"q":"What should happen if a client's financial situation changes significantly mid-program (e.g., job loss)?","opts":["The specialist should document the change and follow escalation/adjustment protocol","Nothing \u2014 the program terms can never be revisited","The client should be immediately removed from the program with no discussion","The specialist should ignore it unless the client brings it up three times"],"a":0,"exp":""},{"q":"Which best describes the specialist's role regarding legal advice to clients?","opts":["Specialists should not provide legal advice and should refer legal questions appropriately","Specialists are expected to give binding legal advice on any topic","Legal advice is required at every enrollment","There is no distinction between financial counseling and legal advice at NCCB"],"a":0,"exp":""},{"q":"What is the purpose of a 'certification/signature block' on program enrollment documents?","opts":["To document the client's informed consent and acknowledgment of disclosed terms","It is purely decorative","It replaces the need for any fee disclosure","It is only used for internal NCCB paperwork, not client-facing"],"a":0,"exp":""},{"q":"A client asks why NCCB charges a retainer before program fees. What is an appropriate, compliant response?","opts":["Explain the retainer structure and fee sequence transparently as disclosed, and provide it in writing if requested","Tell the client retainers are illegal so there is nothing to explain","Avoid answering and change the subject","Tell the client the retainer is fully refundable no matter what, without checking policy"],"a":0,"exp":""},{"q":"Why does NCCB require specialists to log outcome status and next-step notes after every call?","opts":["To support consistent client follow-up and provide an auditable compliance trail","Only to help specialists compete on a leaderboard","It is required only for calls that result in a sale","It is optional documentation with no operational purpose"],"a":0,"exp":""},{"q":"If a client requests cancellation of their Debt Management program, what is the compliant response?","opts":["Follow the documented cancellation process and honor the client's right to cancel per program terms","Refuse the cancellation request outright","Ignore the request until the client calls three more times","Charge an undisclosed penalty fee not in the original agreement"],"a":0,"exp":""},{"q":"What is the significance of a client's 'active' versus 'delinquent' status within a DMP for reporting purposes?","opts":["It reflects whether scheduled payments are current, which affects creditor concessions and program standing","Status has no effect on the program","Only delinquent clients are tracked","Active status guarantees a fixed credit score increase"],"a":0,"exp":""},{"q":"Which is the most appropriate objection-handling approach when a prospect says 'I can just negotiate with my creditors myself'?","opts":["Acknowledge the option, then explain the value of professional negotiation, consolidated payments, and program structure","Argue that self-negotiation is illegal","Hang up since the prospect is not interested","Guarantee the prospect worse outcomes with no evidence"],"a":0,"exp":""},{"q":"What does 'escrow' generally refer to in a program fee structure context?","opts":["Funds held by a third party or the organization for a specific purpose until conditions are met","A type of credit score","A federal telemarketing law","A synonym for retainer with no functional difference"],"a":0,"exp":""},{"q":"Why should a specialist avoid guaranteeing a specific dollar amount of debt reduction to a prospect?","opts":["Outcomes depend on creditor negotiations and individual circumstances, so guarantees can be misleading and non-compliant","Guarantees are always accurate and encouraged","It is fine as long as the client does not ask for it in writing","There is no compliance concern with guarantees"],"a":0,"exp":""},{"q":"What does the abbreviation 'OCCC' stand for?","opts":["Office of Consumer Credit Commissioner","Office of Certified Credit Counselors","Organization for Consumer Credit Compliance","Office of Corporate Credit Control"],"a":0,"exp":""},{"q":"Which registry must telemarketing calls generally be screened against before an outbound sales call?","opts":["The National Do Not Call Registry","The FCRA Registry","The OCCC Complaint Registry","The Bureau Reporting Registry"],"a":0,"exp":""},{"q":"What is the purpose of a 'cease and desist' request from a debtor to a collector under the FDCPA?","opts":["It generally requires the collector to stop further contact except for specific limited purposes (e.g., confirming cessation or notifying of legal action)","It has no legal effect on collector conduct","It automatically cancels the underlying debt","It only applies to secured debts"],"a":0,"exp":""},{"q":"A specialist wants to leave a voicemail for a prospect about their debt. What is a compliance-conscious approach?","opts":["Avoid disclosing specific debt details to a third party or answering machine that others may hear, per general privacy/FDCPA-adjacent principles","Read out the full account balance and creditor name in every voicemail","Voicemail content has no compliance implications","Always leave the client's Social Security Number in the voicemail for verification"],"a":0,"exp":""},{"q":"What is the general purpose of a 'complaint log' maintained by a debt management organization?","opts":["To track, document, and resolve client complaints in an auditable way for compliance oversight","It is optional paperwork with no regulatory relevance","It is only used for marketing analytics","It replaces the need for any client communication"],"a":0,"exp":""},{"q":"Why might a Debt Management Specialist need to verify a client's identity before discussing account details over the phone?","opts":["To protect sensitive financial information and prevent unauthorized disclosure","Identity verification is never required for phone calls","Only written correspondence requires verification","It is solely an IT department requirement"],"a":0,"exp":""},{"q":"What is a 'hardship letter' typically used for in a debt management context?","opts":["Explaining a client's financial hardship to a creditor as part of a concession request","A legal document that automatically discharges debt","A required first step before enrolling in My800Scores","A form used only for bankruptcy filings"],"a":0,"exp":""},{"q":"Which of the following is a reasonable step if a client's DMP payment fails/returns (e.g., NSF)?","opts":["Document the failure, notify the client promptly, and follow the program's returned-payment procedure","Immediately cancel the client's enrollment with no notice","Ignore it since one missed payment never matters","Automatically double the next payment without informing the client"],"a":0,"exp":""},{"q":"What is the general purpose of Truth in Lending Act (TILA) disclosures in a lending-adjacent context?","opts":["To ensure clear, standardized disclosure of credit terms and costs to consumers","To regulate telemarketing call times only","To govern credit bureau dispute timelines","It applies only to mortgage loans and nothing else"],"a":0,"exp":""},{"q":"A client asks whether NCCB can guarantee their creditors will agree to lower interest rates. What is the compliant answer?","opts":["Explain that concessions depend on individual creditor policies and cannot be guaranteed in advance","Guarantee a specific reduced rate to close the enrollment","Tell the client all creditors are legally required to reduce rates","Avoid answering the question at all"],"a":0,"exp":""},{"q":"What should a specialist do if they are uncertain whether a specific statement to a prospect is compliant?","opts":["Consult the SOP, a supervisor, or compliance resources before making the statement","Make the statement anyway since prospects rarely follow up","Assume it is fine if it helps close the enrollment","Only worry about compliance after a complaint is filed"],"a":0,"exp":""},{"q":"Which best describes the purpose of maintaining a call recording or documented call summary for compliance review?","opts":["To provide an objective record supporting quality assurance and regulatory compliance","Call recordings have no compliance purpose","Only sales calls that result in enrollment need to be documented","Documentation is solely for specialist performance rankings"],"a":0,"exp":""},{"q":"What is a reasonable response if a prospect asks for the specialist's license or registration information?","opts":["Provide accurate information about NCCB's OCCC licensing status as required","Refuse to discuss licensing under any circumstance","Tell the prospect licensing does not apply to debt management organizations","Direct the question to the client's own bank instead"],"a":0,"exp":""},{"q":"Why is accurate documentation of a client's total monthly budget important during a DMP proposal?","opts":["It ensures the proposed payment is realistic and sustainable for the client's actual finances","Budget accuracy has no bearing on program approval","Only the client's income matters, not expenses","Budgets are only relevant for Credit Restoration clients"],"a":0,"exp":""},{"q":"What is an appropriate way to handle a prospect who becomes hostile or uses abusive language on a call?","opts":["Remain professional, de-escalate where possible, and follow SOP guidance on ending or escalating the call","Respond with equally hostile language","Immediately hang up with no documentation","Argue with the prospect until they calm down"],"a":0,"exp":""},{"q":"Which is a valid reason a client's DMP enrollment might be adjusted mid-program?","opts":["A documented, verified change in the client's income or expenses","The specialist's personal preference","A creditor's marketing offer unrelated to the client's account","Random monthly adjustments with no client input"],"a":0,"exp":""},{"q":"What is the purpose of confirming a client's mailing address and contact preferences at enrollment?","opts":["To ensure required disclosures, statements, and communications reach the client accurately and per their preference","Contact information is optional once enrollment fees are paid","Only email addresses need to be confirmed","Address confirmation is solely for marketing purposes"],"a":0,"exp":""},{"q":"A client's creditor sends a settlement offer directly to the client instead of NCCB. What should the specialist advise?","opts":["Ask the client to share the offer so it can be reviewed and handled consistently with the program","Tell the client to ignore all creditor correspondence permanently","Instruct the client to accept any offer immediately without review","Explain that creditors are never allowed to contact clients directly"],"a":0,"exp":""},{"q":"What is a compliant way to describe program results to a prospective client?","opts":["Describe typical program mechanics and general possibilities without guaranteeing specific individual outcomes","State a specific guaranteed percentage of debt forgiveness for every client","Avoid discussing outcomes at all, even in general terms","Promise the fastest possible payoff timeline to every prospect"],"a":0,"exp":""},{"q":"Why does NCCB require specialists to disclose that submitting an inquiry is not a commitment?","opts":["To ensure prospects understand that submitting information does not obligate them or guarantee enrollment/approval","Because submitting an inquiry always results in automatic enrollment otherwise","It is a marketing tactic with no consumer protection purpose","It only applies to Credit Restoration inquiries"],"a":0,"exp":""},{"q":"What is the appropriate escalation path if a client reports feeling misled by a previous specialist's statements?","opts":["Document the concern and escalate per the SOP's escalation contacts for review","Dismiss the concern since prior calls cannot be reviewed","Tell the client nothing can be done","Blame the client for misunderstanding"],"a":0,"exp":""},{"q":"Which of these is an accurate description of a 'trust account' used to service DMP payments?","opts":["An account used to hold and distribute client funds to creditors as scheduled, separate from operating funds","A personal savings account owned by the specialist","An account used only for marketing expenses","A synonym for the client's own checking account"],"a":0,"exp":""},{"q":"What should a specialist do before discussing specific account numbers or balances with someone claiming to be the client's spouse?","opts":["Verify authorization to discuss the account with that individual per privacy/documentation standards","Share full account details immediately without verification","Refuse to speak with any third party under any circumstance, even authorized ones","Assume any caller claiming a relationship is automatically authorized"],"a":0,"exp":""},{"q":"Why is it important to clarify the difference between 'enrolled' and 'pending' creditors early in a DMP?","opts":["Clients should understand which creditors have accepted programmed terms versus which are still being negotiated","There is no meaningful difference between the two statuses","Only enrolled creditors need to be disclosed to the client at all","Pending creditors are automatically excluded from all future communication"],"a":0,"exp":""},{"q":"What is a key reason specialists should avoid pressuring a prospect to enroll on the very first call?","opts":["Informed consent requires the prospect to fully understand terms, fees, and alternatives before committing","First-call enrollments are prohibited by federal law in all cases","Pressure tactics are always effective and encouraged","It has no bearing on compliance or client outcomes"],"a":0,"exp":""},{"q":"Which resource should a specialist consult when uncertain which program (Debt Management, Debt Settlement, Credit Restoration, or Credit Counseling) best fits a prospect?","opts":["The Service Advisory & Program Placement Guide","The specialist's personal preference","Whatever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks to see their program agreement again after enrollment?","opts":["Provide a copy of the signed agreement and disclosures promptly","Tell the client agreements cannot be reissued","Charge an undisclosed fee to reprint the agreement","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant call quality across the sales floor?","opts":["Following the documented call script, disclosures, and escalation procedures","Each specialist inventing their own disclosure language","Skipping disclosures when a call is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a specialist consult when uncertain which program (Debt Management, Debt Settlement, Credit Restoration, or Credit Counseling) best fits a prospect? (2)","opts":["The Service Advisory & Program Placement Guide","The specialist's personal preference","Whatever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks to see their program agreement again after enrollment? (2)","opts":["Provide a copy of the signed agreement and disclosures promptly","Tell the client agreements cannot be reissued","Charge an undisclosed fee to reprint the agreement","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant call quality across the sales floor? (2)","opts":["Following the documented call script, disclosures, and escalation procedures","Each specialist inventing their own disclosure language","Skipping disclosures when a call is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a specialist consult when uncertain which program (Debt Management, Debt Settlement, Credit Restoration, or Credit Counseling) best fits a prospect? (3)","opts":["The Service Advisory & Program Placement Guide","The specialist's personal preference","Whatever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks to see their program agreement again after enrollment? (3)","opts":["Provide a copy of the signed agreement and disclosures promptly","Tell the client agreements cannot be reissued","Charge an undisclosed fee to reprint the agreement","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant call quality across the sales floor? (3)","opts":["Following the documented call script, disclosures, and escalation procedures","Each specialist inventing their own disclosure language","Skipping disclosures when a call is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a specialist consult when uncertain which program (Debt Management, Debt Settlement, Credit Restoration, or Credit Counseling) best fits a prospect? (4)","opts":["The Service Advisory & Program Placement Guide","The specialist's personal preference","Whatever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks to see their program agreement again after enrollment? (4)","opts":["Provide a copy of the signed agreement and disclosures promptly","Tell the client agreements cannot be reissued","Charge an undisclosed fee to reprint the agreement","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant call quality across the sales floor? (4)","opts":["Following the documented call script, disclosures, and escalation procedures","Each specialist inventing their own disclosure language","Skipping disclosures when a call is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a specialist consult when uncertain which program (Debt Management, Debt Settlement, Credit Restoration, or Credit Counseling) best fits a prospect? (5)","opts":["The Service Advisory & Program Placement Guide","The specialist's personal preference","Whatever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks to see their program agreement again after enrollment? (5)","opts":["Provide a copy of the signed agreement and disclosures promptly","Tell the client agreements cannot be reissued","Charge an undisclosed fee to reprint the agreement","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant call quality across the sales floor? (5)","opts":["Following the documented call script, disclosures, and escalation procedures","Each specialist inventing their own disclosure language","Skipping disclosures when a call is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a specialist consult when uncertain which program (Debt Management, Debt Settlement, Credit Restoration, or Credit Counseling) best fits a prospect? (6)","opts":["The Service Advisory & Program Placement Guide","The specialist's personal preference","Whatever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks to see their program agreement again after enrollment? (6)","opts":["Provide a copy of the signed agreement and disclosures promptly","Tell the client agreements cannot be reissued","Charge an undisclosed fee to reprint the agreement","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant call quality across the sales floor? (6)","opts":["Following the documented call script, disclosures, and escalation procedures","Each specialist inventing their own disclosure language","Skipping disclosures when a call is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a specialist consult when uncertain which program (Debt Management, Debt Settlement, Credit Restoration, or Credit Counseling) best fits a prospect? (7)","opts":["The Service Advisory & Program Placement Guide","The specialist's personal preference","Whatever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks to see their program agreement again after enrollment? (7)","opts":["Provide a copy of the signed agreement and disclosures promptly","Tell the client agreements cannot be reissued","Charge an undisclosed fee to reprint the agreement","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant call quality across the sales floor? (7)","opts":["Following the documented call script, disclosures, and escalation procedures","Each specialist inventing their own disclosure language","Skipping disclosures when a call is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a specialist consult when uncertain which program (Debt Management, Debt Settlement, Credit Restoration, or Credit Counseling) best fits a prospect? (8)","opts":["The Service Advisory & Program Placement Guide","The specialist's personal preference","Whatever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks to see their program agreement again after enrollment? (8)","opts":["Provide a copy of the signed agreement and disclosures promptly","Tell the client agreements cannot be reissued","Charge an undisclosed fee to reprint the agreement","Ignore the request"],"a":0,"exp":""}],"ccs":[{"q":"What is the current fee for the My800Scores monitoring/scoring product?","opts":["$39.99 per month","$175.95 flat fee","$559 retainer","$35 per account"],"a":0,"exp":""},{"q":"What is the current Credit Counseling program fee?","opts":["$175.95, no retainer","$559 retainer plus 10%","$39.99 per month","$35 per account"],"a":0,"exp":""},{"q":"What is the current Credit Restoration program fee structure?","opts":["$35 per account, no retainer, with a $105 minimum escrow covering 3 accounts","$175.95 flat with no minimum","$559 retainer plus 18%","$39.99 per month per account"],"a":0,"exp":""},{"q":"Which federal law governs the accuracy, use, and dispute rights around consumer credit report information?","opts":["Fair Credit Reporting Act (FCRA)","Truth in Lending Act (TILA)","Fair Debt Collection Practices Act (FDCPA)","Real Estate Settlement Procedures Act (RESPA)"],"a":0,"exp":""},{"q":"Under the FCRA, how long generally does a credit bureau have to investigate a consumer dispute after receiving it?","opts":["30 days (up to 45 in some cases)","5 days","1 year","There is no time limit"],"a":0,"exp":""},{"q":"What are the three major consumer credit bureaus a Credit Counselor Specialist should reference?","opts":["Equifax, Experian, and TransUnion","Equifax, FICO, and VantageScore","Experian, Chase, and Wells Fargo","TransUnion, Moody's, and S&P"],"a":0,"exp":""},{"q":"Which factor typically has the largest impact on a FICO credit score?","opts":["Payment history","Number of hard inquiries","Length of credit history","Credit mix"],"a":0,"exp":"Payment history is generally the single largest weighted factor in FICO scoring models, followed by amounts owed/utilization."},{"q":"What does 'credit utilization' refer to?","opts":["The percentage of available revolving credit currently being used","The number of credit inquiries in the last year","The total number of open accounts","The average age of all accounts"],"a":0,"exp":""},{"q":"A client wants to dispute an inaccurate late payment on their credit report. What is the specialist's appropriate first step?","opts":["Review the account details with the client and prepare a proper dispute per FCRA procedures","Tell the client disputes never work so there is no point","File the dispute without reviewing any documentation","Advise the client to ignore the error since it will disappear on its own"],"a":0,"exp":""},{"q":"What is the purpose of the $105 minimum escrow requirement in the Credit Restoration program?","opts":["It corresponds to the $35-per-account fee applied across a minimum of 3 accounts","It is an arbitrary number with no basis","It is a penalty fee for late payment","It replaces the need for any fee disclosure"],"a":0,"exp":""},{"q":"Which of the following is NOT one of the 'Big 3' credit bureaus?","opts":["Innovis","Equifax","Experian","TransUnion"],"a":0,"exp":"Innovis is a smaller, less commonly used bureau; Equifax, Experian, and TransUnion are the three major bureaus."},{"q":"What should a Credit Counselor Specialist explain about the difference between a 'soft' and 'hard' credit inquiry?","opts":["A hard inquiry can affect a score and results from a credit application; a soft inquiry does not affect score and includes things like pre-qualification checks","Both types affect the score equally","Soft inquiries always lower a score more than hard inquiries","There is no meaningful distinction"],"a":0,"exp":""},{"q":"A client asks how long a late payment stays on their credit report. What is the generally accurate answer?","opts":["Typically up to 7 years from the date of the original delinquency","It never comes off","30 days","1 year, always"],"a":0,"exp":""},{"q":"What is the primary purpose of a credit counseling session at NCCB?","opts":["To assess the client's financial situation and recommend an appropriate program or budgeting path","To sell the highest-fee program regardless of client fit","To collect payment only, with no assessment","To replace the need for any further documentation"],"a":0,"exp":""},{"q":"Which of these best describes 'debt-to-income ratio' (DTI)?","opts":["The percentage of gross monthly income that goes toward debt payments","The total dollar amount of all debts combined","A synonym for credit utilization","The number of active credit accounts a person holds"],"a":0,"exp":""},{"q":"What should a Credit Counselor Specialist do if a client's credit report shows an account that does not belong to them (possible identity theft)?","opts":["Advise the client on the identity theft dispute process and appropriate documentation (e.g., police report, FTC report)","Ignore it since it is outside the counselor's role entirely","Tell the client it cannot be removed under any circumstance","Automatically assume it is a data entry error with no further action"],"a":0,"exp":""},{"q":"What is a 'goodwill letter' in the context of credit restoration?","opts":["A request to a creditor asking them to remove an accurate but negative mark as a courtesy, often after an otherwise good payment history","A legally binding demand with guaranteed removal","A required first step in every FCRA dispute","A synonym for a formal FCRA dispute letter"],"a":0,"exp":""},{"q":"Which best describes the role of My800Scores within the NCCB product lineup?","opts":["A monitoring/scoring product often bundled ahead of Credit Counseling or Credit Restoration enrollment per the fee sequence","A standalone debt settlement product","A bankruptcy filing service","A mortgage refinancing product"],"a":0,"exp":""},{"q":"A prospect says their score is 'too low to fix.' What is an appropriate, compliant counselor response?","opts":["Explain that scores can generally improve over time through disputes, on-time payments, and utilization management, without guaranteeing a specific outcome","Agree that nothing can be done","Guarantee a specific score increase by a specific date","Tell them to stop checking their credit entirely"],"a":0,"exp":""},{"q":"What should a specialist avoid promising regarding credit restoration outcomes, per general compliance standards (e.g., CROA-adjacent principles)?","opts":["Guaranteed removal of accurate negative information or a guaranteed score increase","Explaining the general dispute process","Disclosing program fees","Setting realistic expectations about timelines"],"a":0,"exp":"Similar to Credit Repair Organizations Act (CROA) principles, guaranteeing removal of accurate negative info or a specific score outcome is not compliant."},{"q":"What is the standard passing score requirement for NCCB certification exams?","opts":["More than 80%","Exactly 50%","100%, no exceptions","There is no passing threshold"],"a":0,"exp":""},{"q":"Which of these is an appropriate first step before beginning any counseling engagement with a new client?","opts":["Disclose applicable fees per the correct sequence and confirm client understanding","Collect payment with no disclosure","Skip any assessment and immediately enroll them","Assume the client already knows all program details"],"a":0,"exp":""},{"q":"What does 'credit mix' refer to as a scoring factor?","opts":["The variety of account types a consumer holds (e.g., revolving credit cards, installment loans)","The number of hard inquiries in the past year","The average balance across all accounts","The consumer's income level"],"a":0,"exp":""},{"q":"A client wants to know if closing an old, unused credit card will help their score. What is the most accurate general guidance?","opts":["Closing an old account can shorten average credit history and reduce available credit, potentially lowering the score","Closing old accounts always raises the score immediately","Account age and available credit have no effect on score","Closing accounts has no relationship to credit utilization"],"a":0,"exp":""},{"q":"What is the purpose of documenting every counseling session's outcome in the CRM, even if the client does not enroll?","opts":["To maintain an accurate, auditable record of client interactions for compliance and follow-up","Only enrolled clients require documentation","Documentation is optional for counseling sessions","It has no operational or compliance value"],"a":0,"exp":""},{"q":"Which of these is a legitimate credit-building recommendation a counselor could ethically make?","opts":["Making on-time payments and keeping utilization low over time","Guaranteeing a 100-point score increase in 30 days","Advising the client to open several new accounts simultaneously with no context","Recommending the client ignore collection notices"],"a":0,"exp":""},{"q":"What is the relationship between the Credit Restoration program and the minimum 3-account escrow requirement?","opts":["The $35 per-account fee is applied to at least 3 accounts, producing the $105 minimum","There is no relationship","The escrow covers unlimited accounts regardless of count","It applies only to Debt Management clients"],"a":0,"exp":""},{"q":"A client asks whether paying off a collection account in full will immediately remove it from their credit report.","opts":["Not necessarily \u2014 paying a collection does not guarantee automatic removal, though it may be reflected as paid","Yes, it is always removed automatically the same day","Paid collections never appear on credit reports at all","It has no effect on the report whatsoever"],"a":0,"exp":""},{"q":"Why is it important for a counselor to review a client's full credit report before recommending a program?","opts":["To accurately identify which accounts, disputes, or programs best fit the client's actual situation","Reports are irrelevant to program placement","Only the client's stated debt amount matters, not report detail","Reviewing the report is optional and rarely useful"],"a":0,"exp":""},{"q":"What is an appropriate response if a client becomes emotional or frustrated discussing their credit situation?","opts":["Acknowledge their concerns professionally, stay calm, and guide the conversation back to actionable next steps","End the call immediately","Dismiss their concerns as unimportant","Match their frustration with an equally emotional response"],"a":0,"exp":""},{"q":"Which of these best describes a 'secured credit card' and its typical use case in credit building?","opts":["A card backed by a cash deposit, often used to build or rebuild credit history","A card with unlimited credit and no deposit","A card that cannot be reported to credit bureaus","A synonym for a debit card"],"a":0,"exp":""},{"q":"What should a Credit Counselor Specialist do if a client asks a question outside their expertise (e.g., a specific legal question)?","opts":["Refer the client to an appropriate resource rather than provide legal advice","Answer confidently even without certainty","Ignore the question entirely","Tell the client no one can help them"],"a":0,"exp":""},{"q":"What is the significance of the 'no retainer' language in the Credit Counseling and Credit Restoration fee descriptions?","opts":["It clarifies that clients are not charged an upfront retainer fee for these specific programs, unlike Debt Settlement/Debt Management","It means the programs are entirely free","It means fees are never disclosed","It applies to every NCCB program equally"],"a":0,"exp":""},{"q":"What is a reasonable timeline expectation a counselor might set for typical credit restoration progress, without guaranteeing results?","opts":["Explain that timelines vary by case and bureau response times, generally spanning multiple billing cycles","Guarantee results within 48 hours","Tell the client results are instant","Refuse to discuss timeline at all"],"a":0,"exp":""},{"q":"Which of the following is considered sensitive information that should be handled carefully and documented securely during intake?","opts":["Social Security Number and full credit report details","The client's favorite color","The weather on the day of the call","The specialist's own contact preferences"],"a":0,"exp":""},{"q":"What is the value of explaining 'payment history' as a scoring factor to a client considering a Debt Management referral instead of Credit Restoration?","opts":["It helps the client understand why consistent on-time payments matter regardless of which program they choose","Payment history is irrelevant to either program","Only Credit Restoration clients need to understand payment history","It has no educational value"],"a":0,"exp":""},{"q":"Which of these is an appropriate way to explain the counselor's role to a new client?","opts":["An educator and guide who assesses the client's situation and recommends appropriate, disclosed options","A guaranteed fixer of all credit problems with no client involvement needed","A collections agent","A lender approving new credit"],"a":0,"exp":""},{"q":"What must be true before a Credit Counselor Specialist submits a dispute on a client's behalf?","opts":["The client's authorization/consent and accurate supporting documentation must be obtained","Nothing \u2014 disputes can be filed without any client involvement","The dispute must guarantee removal before filing","Only verbal mention from the client is required with no documentation"],"a":0,"exp":""},{"q":"Why might a counselor recommend a client wait before applying for new credit while working on restoration?","opts":["New hard inquiries and new accounts can temporarily affect scoring factors during an active repair process","New credit applications have zero effect on scoring","Waiting has no strategic value","This is never appropriate advice"],"a":0,"exp":""},{"q":"What is the general purpose of a credit report 'method of verification' request during a dispute?","opts":["It asks the bureau/furnisher to explain how a disputed item was verified as accurate","It automatically deletes any disputed item","It is a request for the client's own credit score history","It replaces the need for the original dispute letter"],"a":0,"exp":""},{"q":"Which of these best describes 'revolving credit' as an account type?","opts":["Credit with a set limit that can be borrowed against repeatedly, like a credit card","A fixed-term loan with equal monthly payments, like an auto loan","A one-time cash advance with no repayment structure","A synonym for a mortgage loan"],"a":0,"exp":""},{"q":"Which of these best describes 'installment credit' as an account type?","opts":["A loan repaid in fixed regular payments over a set term, like an auto loan or personal loan","A credit card with a revolving limit","A synonym for a collections account","An account with no defined repayment schedule"],"a":0,"exp":""},{"q":"What is a 'charge-off' on a credit report?","opts":["A creditor's accounting write-off of a severely delinquent debt as a loss, though the debt may still be owed and collectible","A confirmation that the debt has been fully forgiven with no further obligation","A synonym for a paid-in-full account","A type of new account inquiry"],"a":0,"exp":""},{"q":"Why might a counselor recommend a client review their credit report for accuracy at least annually?","opts":["To catch errors, outdated information, or potential fraud early","Annual review is required only once in a lifetime","Credit reports never contain errors so review is unnecessary","Only lenders are permitted to review credit reports"],"a":0,"exp":""},{"q":"What is 'available credit' and why does it matter to utilization?","opts":["The unused portion of a revolving credit limit; more available credit relative to balances generally lowers utilization","A synonym for total debt owed","It only applies to installment loans","It has no relationship to credit utilization"],"a":0,"exp":""},{"q":"A client asks whether checking their own credit report hurts their score. What is the accurate answer?","opts":["No \u2014 checking your own report is a soft inquiry and does not affect the score","Yes, it always lowers the score significantly","Only bureau-initiated checks are safe; self-checks always hurt the score","It depends on which day of the month it is checked"],"a":0,"exp":""},{"q":"What is the purpose of a 'credit freeze' versus a 'fraud alert'?","opts":["A freeze restricts new account access entirely until lifted; a fraud alert flags the file for extra verification but does not block access outright","They are identical tools with no functional difference","A fraud alert is only available to businesses, not consumers","A credit freeze permanently deletes the credit file"],"a":0,"exp":""},{"q":"Why would a counselor advise a client to keep older, well-managed credit accounts open?","opts":["Longer average account age can positively support the length-of-credit-history scoring factor","Older accounts always hurt the score","Account age has no scoring relevance","Only new accounts matter for scoring"],"a":0,"exp":""},{"q":"What is the general purpose of a 'budget worksheet' used in a credit counseling session?","opts":["To help the client see income versus expenses clearly and identify areas for adjustment","It is required paperwork with no counseling value","It replaces the need for a credit report review","It is used only for Debt Management clients, never Credit Restoration"],"a":0,"exp":""},{"q":"Which of these is an example of a legitimate step in the FCRA dispute process?","opts":["Submitting a written dispute identifying the specific inaccurate item with supporting documentation","Calling the bureau and verbally requesting deletion with no documentation","Threatening legal action as the only permitted first step","Disputing every item on the report regardless of accuracy"],"a":0,"exp":""},{"q":"What should a counselor tell a client about 'credit repair' companies that guarantee specific results?","opts":["Guarantees of specific outcomes (e.g., a guaranteed score increase) are a compliance red flag consumers should be cautious of","All guarantees from any company are automatically trustworthy","Guarantees are required by law from every credit services company","There is no meaningful difference between guaranteed and non-guaranteed claims"],"a":0,"exp":""},{"q":"Why might a lender's 'rate shopping' inquiries for the same loan type in a short window count as a single inquiry for scoring purposes?","opts":["Many scoring models group similar inquiries within a short window to avoid penalizing comparison shopping","Each inquiry always counts separately no matter the timing","Rate shopping inquiries are excluded from credit reports entirely","This concept applies only to credit card applications"],"a":0,"exp":""},{"q":"What is the value of explaining 'derogatory marks' to a client in plain language?","opts":["It helps the client understand which specific negative items are affecting their credit and how to address them","Derogatory marks are not something clients are permitted to know about","Only counselors need to understand derogatory marks, not clients","Explaining derogatory marks is discouraged practice"],"a":0,"exp":""},{"q":"Which of the following is an appropriate way to discuss a client's options after a completed credit report review?","opts":["Present the relevant program options (e.g., Credit Restoration, Credit Counseling) with fees disclosed, and let the client decide","Choose the highest-fee program automatically without disclosure","Withhold program options unless the client specifically asks","Recommend a program unrelated to the client's actual report findings"],"a":0,"exp":""},{"q":"What does 'authorized user' status on a credit card generally mean for credit building?","opts":["A person added to another's credit card account, whose payment history on that account may appear on their own report","A person who owns the account outright","A synonym for a joint account holder with equal liability","It has no possible effect on a credit report"],"a":0,"exp":""},{"q":"Why is it important for a counselor to distinguish between a 'collection account' and the 'original creditor' account on a report?","opts":["Both may appear separately and clients should understand which is currently active for dispute or resolution purposes","They are always the exact same entry with no distinction needed","Only the original creditor account matters for score purposes","Collection accounts are never reportable"],"a":0,"exp":""},{"q":"What is a reasonable explanation for why paying down high credit card balances can help a score relatively quickly?","opts":["It directly reduces credit utilization, one of the most heavily weighted scoring factors","Paying balances has no effect on utilization","Only paying accounts to zero has any effect at all","Utilization is not considered by any scoring model"],"a":0,"exp":""},{"q":"What should a counselor avoid doing when explaining timelines for credit restoration progress?","opts":["Avoid promising a specific guaranteed date for results, since bureau/furnisher response times vary","Avoid discussing timelines at all, even in general terms","Always promise results within 24 hours to reassure the client","Refuse to answer any timeline question"],"a":0,"exp":""},{"q":"Which is the most accurate description of the counselor's role when a client's report shows accurate negative information?","opts":["Explain the client's options (e.g., goodwill requests, time-based improvement, responsible new credit use) without guaranteeing removal of accurate items","Guarantee removal of the accurate item regardless of accuracy","Tell the client nothing can ever be done about accurate information","Advise the client to dispute it as inaccurate even though it is accurate"],"a":0,"exp":""},{"q":"What is an appropriate way to document a client's stated financial goals during intake?","opts":["Record them accurately in the CRM to guide program recommendations and follow-up","Goals do not need to be documented","Only the specialist's assumptions about goals should be recorded","Documentation of goals is solely for marketing purposes"],"a":0,"exp":""},{"q":"Why might a counselor ask about a client's upcoming major purchases (e.g., a home or auto loan) during a session?","opts":["It helps tailor advice around timing new credit activity or restoration work appropriately","Upcoming purchases are irrelevant to credit counseling","Only Debt Management clients are ever asked this question","This information is never relevant to program recommendations"],"a":0,"exp":""},{"q":"What is the significance of explaining 'inquiry' types (hard vs. soft) when a client is worried about applying for several things at once?","opts":["It helps set accurate expectations about which activities may affect their score and by how much","All inquiries are identical in effect, so no distinction is useful","Only soft inquiries are ever visible to the client","This distinction is only relevant to lenders, never consumers"],"a":0,"exp":""},{"q":"Which best explains why NCCB requires a documented outcome for every credit counseling session, even ones that do not result in enrollment?","opts":["It maintains an accurate compliance record and supports appropriate follow-up regardless of outcome","Only successful enrollments require documentation","Session outcomes are optional to record","Documentation has no bearing on compliance"],"a":0,"exp":""},{"q":"Which resource should a Credit Counselor Specialist consult when uncertain which program best fits a client's credit profile?","opts":["The Service Advisory & Program Placement Guide","The counselor's personal preference","Whichever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks for a copy of their dispute letter after it has been submitted?","opts":["Provide a copy promptly for the client's records","Tell the client copies are never provided","Charge an undisclosed fee for a copy","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant counseling quality across the team?","opts":["Following documented disclosure standards, session structure, and escalation procedures","Each counselor inventing their own disclosure language","Skipping disclosures when a session is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a Credit Counselor Specialist consult when uncertain which program best fits a client's credit profile? (2)","opts":["The Service Advisory & Program Placement Guide","The counselor's personal preference","Whichever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks for a copy of their dispute letter after it has been submitted? (2)","opts":["Provide a copy promptly for the client's records","Tell the client copies are never provided","Charge an undisclosed fee for a copy","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant counseling quality across the team? (2)","opts":["Following documented disclosure standards, session structure, and escalation procedures","Each counselor inventing their own disclosure language","Skipping disclosures when a session is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a Credit Counselor Specialist consult when uncertain which program best fits a client's credit profile? (3)","opts":["The Service Advisory & Program Placement Guide","The counselor's personal preference","Whichever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks for a copy of their dispute letter after it has been submitted? (3)","opts":["Provide a copy promptly for the client's records","Tell the client copies are never provided","Charge an undisclosed fee for a copy","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant counseling quality across the team? (3)","opts":["Following documented disclosure standards, session structure, and escalation procedures","Each counselor inventing their own disclosure language","Skipping disclosures when a session is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a Credit Counselor Specialist consult when uncertain which program best fits a client's credit profile? (4)","opts":["The Service Advisory & Program Placement Guide","The counselor's personal preference","Whichever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks for a copy of their dispute letter after it has been submitted? (4)","opts":["Provide a copy promptly for the client's records","Tell the client copies are never provided","Charge an undisclosed fee for a copy","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant counseling quality across the team? (4)","opts":["Following documented disclosure standards, session structure, and escalation procedures","Each counselor inventing their own disclosure language","Skipping disclosures when a session is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a Credit Counselor Specialist consult when uncertain which program best fits a client's credit profile? (5)","opts":["The Service Advisory & Program Placement Guide","The counselor's personal preference","Whichever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks for a copy of their dispute letter after it has been submitted? (5)","opts":["Provide a copy promptly for the client's records","Tell the client copies are never provided","Charge an undisclosed fee for a copy","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant counseling quality across the team? (5)","opts":["Following documented disclosure standards, session structure, and escalation procedures","Each counselor inventing their own disclosure language","Skipping disclosures when a session is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a Credit Counselor Specialist consult when uncertain which program best fits a client's credit profile? (6)","opts":["The Service Advisory & Program Placement Guide","The counselor's personal preference","Whichever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks for a copy of their dispute letter after it has been submitted? (6)","opts":["Provide a copy promptly for the client's records","Tell the client copies are never provided","Charge an undisclosed fee for a copy","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant counseling quality across the team? (6)","opts":["Following documented disclosure standards, session structure, and escalation procedures","Each counselor inventing their own disclosure language","Skipping disclosures when a session is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a Credit Counselor Specialist consult when uncertain which program best fits a client's credit profile? (7)","opts":["The Service Advisory & Program Placement Guide","The counselor's personal preference","Whichever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks for a copy of their dispute letter after it has been submitted? (7)","opts":["Provide a copy promptly for the client's records","Tell the client copies are never provided","Charge an undisclosed fee for a copy","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant counseling quality across the team? (7)","opts":["Following documented disclosure standards, session structure, and escalation procedures","Each counselor inventing their own disclosure language","Skipping disclosures when a session is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a Credit Counselor Specialist consult when uncertain which program best fits a client's credit profile? (8)","opts":["The Service Advisory & Program Placement Guide","The counselor's personal preference","Whichever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks for a copy of their dispute letter after it has been submitted? (8)","opts":["Provide a copy promptly for the client's records","Tell the client copies are never provided","Charge an undisclosed fee for a copy","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant counseling quality across the team? (8)","opts":["Following documented disclosure standards, session structure, and escalation procedures","Each counselor inventing their own disclosure language","Skipping disclosures when a session is running long","Avoiding documentation to save time"],"a":0,"exp":""},{"q":"Which resource should a Credit Counselor Specialist consult when uncertain which program best fits a client's credit profile? (9)","opts":["The Service Advisory & Program Placement Guide","The counselor's personal preference","Whichever program has the highest fee","A random program selector"],"a":0,"exp":""},{"q":"What is the correct response if a client asks for a copy of their dispute letter after it has been submitted? (9)","opts":["Provide a copy promptly for the client's records","Tell the client copies are never provided","Charge an undisclosed fee for a copy","Ignore the request"],"a":0,"exp":""},{"q":"Which of the following best supports consistent, compliant counseling quality across the team? (9)","opts":["Following documented disclosure standards, session structure, and escalation procedures","Each counselor inventing their own disclosure language","Skipping disclosures when a session is running long","Avoiding documentation to save time"],"a":0,"exp":""}]};
+
+const PASS_PCT = 80;
+let currentUser = null;
+let currentExamKey = null;
+let currentAnswers = {};
+let currentExamRuntime = []; // per-attempt shuffled question/option order for the exam currently in progress
+let localAttempts = JSON.parse(localStorage.getItem('nccb_cert_attempts_v1') || '[]');
+let lastResult = null;
+
+/* ---------------- ANTI-CHEATING: per-rep, per-attempt shuffle ----------------
+   Each rep gets a different question order AND a different answer-option order
+   for the same exam, re-shuffled again on every retake — so "the answer is
+   option C" can never be shared between reps or reused across attempts.
+   Correctness is tracked by each option's ORIGINAL index (origIdx), never by
+   its shuffled screen position, so the question and its correct answer can
+   never drift apart on either the frontend (grading) or backend (the score
+   synced to the Sheet is always computed from this same binding). The master
+   Answer Key (Admin tab) always reads the canonical, unshuffled QUESTIONS
+   data directly, so it never needs to account for any rep's shuffle. */
+function hashSeed(str){
+  let h = 1779033703 ^ str.length;
+  for(let i=0;i<str.length;i++){
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return function(){
+    h = Math.imul(h ^ (h >>> 16), 2246822519);
+    h = Math.imul(h ^ (h >>> 13), 3266489917);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, rng){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(rng()*(i+1));
+    const tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+function buildExamRuntime(examKey, username, attemptNum){
+  const base = QUESTIONS[examKey];
+  const rng = hashSeed(username + '|' + examKey + '|' + attemptNum);
+  const qOrder = seededShuffle(base.map((q,i)=>i), rng);
+  return qOrder.map(origQIndex=>{
+    const qd = base[origQIndex];
+    const optsWithIdx = qd.opts.map((text,oi)=>({ text, origIdx: oi }));
+    const shuffledOpts = seededShuffle(optsWithIdx, rng);
+    const correctPos = shuffledOpts.findIndex(o=>o.origIdx===qd.a);
+    return { origQIndex, q: qd.q, opts: shuffledOpts, correctPos };
+  });
+}
+
+/* ---------------- LOGIN ---------------- */
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPin').value.trim();
+  const emp = EMPLOYEES.find(e => e.username.toLowerCase() === u.toLowerCase() && e.pin === p);
+  const errEl = document.getElementById('loginErr');
+  if(!emp){ errEl.style.display='block'; return; }
+  errEl.style.display='none';
+  currentUser = emp;
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('whoLabel').textContent = emp.name + (emp.admin ? ' · Administrator' : '');
+  buildTabs();
+  showView('dashboard');
+  if(emp.admin) refreshAdminData();
+}
+function logout(){
+  currentUser = null;
+  document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value=''; document.getElementById('loginPin').value='';
+}
+
+/* ---------------- TABS / VIEWS ---------------- */
+function buildTabs(){
+  const nav = document.getElementById('navTabs');
+  let html = `<button data-v="dashboard" onclick="showView('dashboard')">My Certifications</button>`;
+  if(currentUser.admin) html += `<button data-v="admin" onclick="showView('admin')">Admin Dashboard</button>`;
+  nav.innerHTML = html;
+  markTab('dashboard');
+}
+function markTab(v){
+  document.querySelectorAll('#navTabs button').forEach(b=>b.classList.toggle('active', b.dataset.v===v));
+}
+function showView(name){
+  ['dashboard','exam','results','cert','admin'].forEach(v=>{
+    document.getElementById('view-'+v).classList.toggle('hidden', v!==name);
+  });
+  if(name==='dashboard' || name==='admin') markTab(name);
+  if(name==='dashboard') renderDashboard();
+  if(name==='admin') renderAdmin();
+}
+
+/* ---------------- DASHBOARD ---------------- */
+function bestAttemptFor(username, examKey, source){
+  const list = source.filter(a => a.username===username && a.exam===examKey);
+  if(!list.length) return null;
+  return list.reduce((best,a)=> a.pct > best.pct ? a : best, list[0]);
+}
+function myAttemptsCombined(){
+  // merge local cache + (if loaded) server cache for this user
+  return (window.__adminCache || localAttempts).filter(a => a.username === currentUser.username);
+}
+function renderDashboard(){
+  const grid = document.getElementById('examGrid');
+  grid.innerHTML = '';
+  currentUser.access.forEach(key=>{
+    const ex = EXAMS[key];
+    const mine = myAttemptsCombined().filter(a=>a.exam===key);
+    const best = mine.length ? mine.reduce((b,a)=>a.pct>b.pct?a:b, mine[0]) : null;
+    let badge = `<span class="badge none">No Attempts</span>`;
+    if(best) badge = best.pct >= PASS_PCT ? `<span class="badge pass">Certified — ${best.pct}%</span>` : `<span class="badge fail">Not Certified — best ${best.pct}%</span>`;
+    grid.innerHTML += `
+      <div class="examTile">
+        ${badge}
+        <h3>${ex.label}</h3>
+        <p>${ex.desc}</p>
+        <div class="row">
+          <button class="btn orange small" onclick="startExam('${key}')">${best && best.pct>=PASS_PCT ? 'Retake Exam' : 'Start Exam'}</button>
+          ${best && best.pct>=PASS_PCT ? `<button class="btn small" onclick="showCertFor('${key}', ${JSON.stringify(best).replace(/"/g,'&quot;')})">View Certificate</button>` : ''}
+        </div>
+      </div>`;
+  });
+
+  const tbody = document.querySelector('#myHistoryTable tbody');
+  const mine = myAttemptsCombined().slice().sort((a,b)=> new Date(b.ts)-new Date(a.ts));
+  tbody.innerHTML = mine.map((a,i)=>`
+    <tr>
+      <td>${EXAMS[a.exam] ? EXAMS[a.exam].label : a.exam}</td>
+      <td>#${a.attemptNum || (i+1)}</td>
+      <td>${a.pct}% (${a.correct}/${a.total})</td>
+      <td>${a.pct>=PASS_PCT ? '<b style="color:var(--green)">PASS</b>' : '<b style="color:var(--red)">FAIL</b>'}</td>
+      <td>${new Date(a.ts).toLocaleString()}</td>
+    </tr>`).join('');
+  document.getElementById('myHistoryEmpty').classList.toggle('hidden', mine.length>0);
+}
+
+/* ---------------- EXAM RUNNER ---------------- */
+function startExam(key){
+  currentExamKey = key;
+  currentAnswers = {};
+  const ex = EXAMS[key];
+  const priorAttempts = myAttemptsCombined().filter(a=>a.exam===key).length;
+  const attemptNum = priorAttempts + 1;
+  currentExamRuntime = buildExamRuntime(key, currentUser.username, attemptNum);
+  document.getElementById('examTitle').textContent = ex.label + ' — Certification Exam';
+  document.getElementById('examSub').textContent = currentExamRuntime.length + ' questions · ' + PASS_PCT + '% required to pass';
+  const container = document.getElementById('examQuestions');
+  container.innerHTML = currentExamRuntime.map((rq,i)=>`
+    <div class="qBlock">
+      <div class="qNum">Question ${i+1} of ${currentExamRuntime.length}</div>
+      <div class="qText">${rq.q}</div>
+      ${rq.opts.map((opt,oi)=>`
+        <label class="optRow" id="opt-${i}-${oi}" onclick="selectAnswer(${i},${oi})">
+          <input type="radio" name="q${i}" value="${oi}"> ${opt.text}
+        </label>`).join('')}
+    </div>`).join('');
+  updateExamProgress();
+  showView('exam');
+  window.scrollTo(0,0);
+}
+function selectAnswer(qi, oi){
+  currentAnswers[qi] = oi;
+  document.querySelectorAll(`[id^="opt-${qi}-"]`).forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  updateExamProgress();
+}
+function updateExamProgress(){
+  const total = currentExamRuntime.length;
+  const answered = Object.keys(currentAnswers).length;
+  document.getElementById('examProgress').style.width = (answered/total*100)+'%';
+  document.getElementById('examProgressLbl').textContent = answered+' / '+total+' answered';
+}
+function submitExam(){
+  const total = currentExamRuntime.length;
+  const answered = Object.keys(currentAnswers).length;
+  if(answered < total){
+    const warn = document.getElementById('examWarn');
+    warn.textContent = (total-answered)+' question(s) still unanswered. Please answer every question before submitting.';
+    warn.classList.remove('hidden');
+    return;
+  }
+  let correct = 0;
+  currentExamRuntime.forEach((rq,i)=>{ if(currentAnswers[i]===rq.correctPos) correct++; });
+  const pct = Math.round((correct/total)*100);
+  const priorAttempts = myAttemptsCombined().filter(a=>a.exam===currentExamKey).length;
+  const record = {
+    username: currentUser.username, name: currentUser.name, exam: currentExamKey,
+    correct, total, pct, attemptNum: priorAttempts+1, ts: new Date().toISOString()
+  };
+  localAttempts.push(record);
+  localStorage.setItem('nccb_cert_attempts_v1', JSON.stringify(localAttempts));
+  lastResult = record;
+  syncAttempt(record);
+  renderResults(record);
+}
+function renderResults(r){
+  const ex = EXAMS[r.exam];
+  document.getElementById('resultsTitle').textContent = ex.label + ' — Results';
+  const circle = document.getElementById('scoreCircle');
+  circle.className = 'scoreCircle ' + (r.pct>=PASS_PCT?'pass':'fail');
+  document.getElementById('scorePct').textContent = r.pct+'%';
+  document.getElementById('scoreLbl').textContent = r.correct+' / '+r.total+' correct';
+  document.getElementById('resultVerdict').textContent = r.pct>=PASS_PCT ? 'Passed — Certified' : 'Not Passed';
+  document.getElementById('resultVerdict').style.color = r.pct>=PASS_PCT ? 'var(--green)' : 'var(--red)';
+  document.getElementById('resultDetail').textContent = r.pct>=PASS_PCT
+    ? 'Congratulations — you have met the '+PASS_PCT+'% certification requirement for the '+ex.label+' exam.'
+    : 'A score of '+PASS_PCT+'% or higher is required to certify. You may retake this exam.';
+  document.getElementById('viewCertBtn').classList.toggle('hidden', r.pct<PASS_PCT);
+  document.getElementById('retakeBtn').classList.toggle('hidden', r.pct>=PASS_PCT);
+  showView('results');
+}
+function retakeExam(){ startExam(currentExamKey); }
+
+/* ---------------- CERTIFICATE ---------------- */
+function openCertificate(){ drawCertificate(lastResult, 'certCanvas'); showView('cert'); }
+function showCertFor(examKey, record){ drawCertificate(record, 'certCanvas'); showView('cert'); }
+function drawCertificate(r, canvasId){
+  const ex = EXAMS[r.exam];
+  const c = document.getElementById(canvasId || 'certCanvas');
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  // background
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,c.width,c.height);
+  ctx.strokeStyle = '#E8720C'; ctx.lineWidth = 14; ctx.strokeRect(20,20,c.width-40,c.height-40);
+  ctx.strokeStyle = '#12233B'; ctx.lineWidth = 3; ctx.strokeRect(42,42,c.width-84,c.height-84);
+  // header
+  ctx.fillStyle = '#12233B'; ctx.textAlign = 'center';
+  ctx.font = 'bold 26px Verdana'; ctx.fillText('NCCB CREDIT', c.width/2, 130);
+  ctx.font = '16px Verdana'; ctx.fillStyle = '#5B6472'; ctx.fillText('Specialist Certification Portal', c.width/2, 158);
+  ctx.font = 'bold 44px Georgia'; ctx.fillStyle = '#12233B'; ctx.fillText('Certificate of Completion', c.width/2, 250);
+  ctx.font = '18px Verdana'; ctx.fillStyle = '#5B6472'; ctx.fillText('This certifies that', c.width/2, 320);
+  ctx.font = 'bold 40px Georgia'; ctx.fillStyle = '#E8720C'; ctx.fillText(r.name, c.width/2, 385);
+  ctx.font = '18px Verdana'; ctx.fillStyle = '#5B6472';
+  ctx.fillText('has successfully completed the', c.width/2, 430);
+  ctx.font = 'bold 28px Georgia'; ctx.fillStyle = '#12233B';
+  ctx.fillText(ex.label + ' Certification Exam', c.width/2, 470);
+  ctx.font = '18px Verdana'; ctx.fillStyle = '#5B6472';
+  ctx.fillText('with a score of ' + r.pct + '% (' + r.correct + ' of ' + r.total + ' correct)', c.width/2, 510);
+  // date + signature line
+  ctx.font = '15px Verdana'; ctx.fillStyle = '#5B6472';
+  const dt = new Date(r.ts);
+  ctx.fillText('Completed: ' + dt.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}), c.width/2, 570);
+  ctx.strokeStyle = '#12233B'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(c.width/2-160, 690); ctx.lineTo(c.width/2+160, 690); ctx.stroke();
+  ctx.font = 'bold 14px Verdana'; ctx.fillStyle = '#12233B';
+  ctx.fillText('Dickson Ewemade — Executive Management, NCCB Credit', c.width/2, 712);
+  ctx.font = '11px Verdana'; ctx.fillStyle = '#9aa1ab';
+  ctx.fillText('Certificate ID: NCCB-'+r.exam.toUpperCase()+'-'+r.username.replace(/[^A-Za-z0-9]/g,'')+'-'+dt.getTime(), c.width/2, 900);
+}
+function downloadCert(){
+  const c = document.getElementById('certCanvas');
+  const link = document.createElement('a');
+  link.download = 'NCCB_Certificate_'+(lastResult?lastResult.exam:currentExamKey)+'.png';
+  link.href = c.toDataURL('image/png');
+  link.click();
+}
+
+/* ---------------- GOOGLE SHEETS SYNC ---------------- */
+function backendConfigured(){
+  return CONFIG.WEBAPP_URL && !CONFIG.WEBAPP_URL.startsWith('PASTE_');
+}
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = String(s==null?'':s);
+  return d.innerHTML;
+}
+function syncAttempt(record){
+  const msgEl = document.getElementById('syncMsg');
+  if(!backendConfigured()){
+    msgEl.innerHTML = '<div class="msg warn">Offline demo mode — this result is only saved in this browser. CONFIG.WEBAPP_URL is currently: <code>'+escapeHtml(CONFIG.WEBAPP_URL)+'</code> — paste your real Apps Script Web App URL there (in index.html) and re-upload to Netlify to sync results to Google Sheets across all devices.</div>';
+    return;
+  }
+  fetch(CONFIG.WEBAPP_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action:'submitAttempt', record })
+  }).then(r=>r.json()).then(res=>{
+    if(!res || !res.ok){ msgEl.innerHTML = '<div class="msg warn">Result saved locally, but the Google Sheets sync reported an error.</div>'; }
+    else { msgEl.innerHTML = ''; }
+  }).catch(()=>{
+    msgEl.innerHTML = '<div class="msg warn">Result saved locally, but could not reach the Google Sheets backend (offline or URL not deployed yet).</div>';
+  });
+}
+function refreshAdminData(){
+  if(!backendConfigured()){
+    window.__adminCache = null;
+    renderAdmin();
+    return;
+  }
+  fetch(CONFIG.WEBAPP_URL + '?action=getAllResults')
+    .then(r=>r.json())
+    .then(res=>{
+      if(res && res.ok){ window.__adminCache = res.attempts || []; }
+      renderAdmin(); renderDashboard();
+    })
+    .catch(()=>{ renderAdmin(); });
+}
+
+/* ---------------- ADMIN DASHBOARD ---------------- */
+function allAttemptsSource(){ return window.__adminCache || localAttempts; }
+function renderAdmin(){
+  if(!currentUser || !currentUser.admin) return;
+  const source = allAttemptsSource();
+  const examFilter = document.getElementById('fltExam').value;
+  const statusFilter = document.getElementById('fltStatus').value;
+  const nameFilter = (document.getElementById('fltName').value||'').toLowerCase();
+
+  // build per-employee-per-exam summary
+  let rows = [];
+  EMPLOYEES.forEach(emp=>{
+    emp.access.forEach(examKey=>{
+      const mine = source.filter(a=>a.username===emp.username && a.exam===examKey);
+      const best = mine.length ? mine.reduce((b,a)=>a.pct>b.pct?a:b, mine[0]) : null;
+      const last = mine.length ? mine.slice().sort((a,b)=>new Date(b.ts)-new Date(a.ts))[0] : null;
+      const status = !mine.length ? 'none' : (best.pct>=PASS_PCT ? 'pass' : 'fail');
+      rows.push({ emp, examKey, best, attempts: mine.length, status, last });
+    });
+  });
+  rows = rows.filter(r=>{
+    if(examFilter && r.examKey!==examFilter) return false;
+    if(statusFilter && r.status!==statusFilter) return false;
+    if(nameFilter && !r.emp.name.toLowerCase().includes(nameFilter)) return false;
+    return true;
+  });
+
+  const statTiles = document.getElementById('adminStats');
+  const totalCert = rows.filter(r=>r.status==='pass').length;
+  const totalAttemptsAll = source.length;
+  const totalPending = rows.filter(r=>r.status!=='pass').length;
+  statTiles.innerHTML = `
+    <div class="statTile"><div class="n">${EMPLOYEES.length}</div><div class="l">Employees</div></div>
+    <div class="statTile"><div class="n">${totalCert}</div><div class="l">Certifications Earned</div></div>
+    <div class="statTile"><div class="n">${totalPending}</div><div class="l">Not Yet Certified</div></div>
+    <div class="statTile"><div class="n">${totalAttemptsAll}</div><div class="l">Total Attempts Logged</div></div>
+  `;
+
+  const body = document.getElementById('adminTableBody');
+  body.innerHTML = rows.map(r=>{
+    const statusHtml = r.status==='pass' ? '<span class="badge pass">Certified</span>'
+                      : r.status==='fail' ? '<span class="badge fail">Not Certified</span>'
+                      : '<span class="badge none">No Attempt</span>';
+    return `<tr>
+      <td>${r.emp.name}</td>
+      <td>${r.emp.username}</td>
+      <td>${EXAMS[r.examKey].label}</td>
+      <td>${r.best ? r.best.pct+'%' : '—'}</td>
+      <td>${r.attempts}</td>
+      <td>${statusHtml}</td>
+      <td>${r.last ? new Date(r.last.ts).toLocaleDateString() : '—'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('adminEmpty').classList.toggle('hidden', rows.length>0);
+
+  const logBody = document.getElementById('adminLogBody');
+  const log = source.slice().sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+  logBody.innerHTML = log.map((a,i)=>`
+    <tr>
+      <td>${log.length-i}</td>
+      <td>${a.name||a.username}${a.awardedBy?' <span style="color:var(--orange-dark);font-size:10.5px;">(awarded by '+a.awardedBy+')</span>':''}</td>
+      <td>${EXAMS[a.exam]?EXAMS[a.exam].label:a.exam}</td>
+      <td>${a.pct}% (${a.correct}/${a.total})</td>
+      <td>${a.pct>=PASS_PCT?'<b style="color:var(--green)">PASS</b>':'<b style="color:var(--red)">FAIL</b>'}</td>
+      <td>${new Date(a.ts).toLocaleString()}</td>
+    </tr>`).join('');
+}
+
+/* ---------------- ADMIN SUB-TABS ---------------- */
+function showAdminSub(name){
+  ['results','answerkey','award'].forEach(v=>{
+    document.getElementById('admin-sub-'+v).classList.toggle('hidden', v!==name);
+  });
+  document.querySelectorAll('#adminSubTabs button').forEach(b=>b.classList.toggle('active', b.dataset.av===name));
+  if(name==='answerkey') renderAnswerKey();
+  if(name==='award') populateAwardForm();
+}
+
+/* ---------------- ANSWER KEY ---------------- */
+function renderAnswerKey(){
+  const key = document.getElementById('akExam').value || 'dms';
+  const qs = QUESTIONS[key];
+  const body = document.getElementById('answerKeyBody');
+  body.innerHTML = qs.map((q,i)=>`
+    <div class="qBlock">
+      <div class="qNum">Question ${i+1} of ${qs.length}</div>
+      <div class="qText">${q.q}</div>
+      ${q.opts.map((opt,oi)=> oi===q.a
+        ? `<div class="optRow selected" style="cursor:default;"><b>✔ ${opt}</b> <span style="color:var(--green);font-size:11px;font-weight:bold;">— CORRECT ANSWER</span></div>`
+        : `<div class="optRow" style="cursor:default;opacity:.65;">${opt}</div>`
+      ).join('')}
+      ${q.exp ? `<div style="font-size:11.5px;color:var(--grey);margin-top:4px;"><i>Note: ${q.exp}</i></div>` : ''}
+    </div>`).join('');
+}
+
+/* ---------------- AWARD CERTIFICATION (admin-driven) ---------------- */
+function populateAwardForm(){
+  const userSel = document.getElementById('awardUser');
+  userSel.innerHTML = EMPLOYEES.map(e=>`<option value="${e.username}">${e.name} (${e.username})</option>`).join('');
+  updateAwardExamOptions();
+  userSel.onchange = updateAwardExamOptions;
+  const dateEl = document.getElementById('awardDate');
+  if(!dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
+  document.getElementById('awardCertCard').classList.add('hidden');
+}
+function updateAwardExamOptions(){
+  const username = document.getElementById('awardUser').value;
+  const emp = EMPLOYEES.find(e=>e.username===username);
+  const examSel = document.getElementById('awardExam');
+  examSel.innerHTML = (emp ? emp.access : Object.keys(EXAMS)).map(k=>`<option value="${k}">${EXAMS[k].label}</option>`).join('');
+}
+function submitAward(){
+  const username = document.getElementById('awardUser').value;
+  const examKey = document.getElementById('awardExam').value;
+  const scoreInput = parseInt(document.getElementById('awardScore').value, 10);
+  const dateInput = document.getElementById('awardDate').value;
+  const emp = EMPLOYEES.find(e=>e.username===username);
+  const msgEl = document.getElementById('awardMsg');
+  if(!emp || !examKey || isNaN(scoreInput) || scoreInput<0 || scoreInput>100){
+    msgEl.innerHTML = '<div class="msg warn">Please select a rep, exam, and a valid score (0-100).</div>';
+    return;
+  }
+  const total = QUESTIONS[examKey].length;
+  const correct = Math.round((scoreInput/100)*total);
+  const pct = Math.round((correct/total)*100);
+  const priorAttempts = (window.__adminCache||localAttempts).filter(a=>a.username===username && a.exam===examKey).length;
+  const ts = new Date(dateInput + 'T12:00:00').toISOString();
+  const record = {
+    username: emp.username, name: emp.name, exam: examKey,
+    correct, total, pct, attemptNum: priorAttempts+1, ts,
+    awardedBy: currentUser.name
+  };
+  localAttempts.push(record);
+  localStorage.setItem('nccb_cert_attempts_v1', JSON.stringify(localAttempts));
+  if(window.__adminCache) window.__adminCache.push(record);
+  syncAward(record);
+  drawCertificate(record, 'certCanvasAdmin');
+  window.__lastAwardRecord = record;
+  document.getElementById('awardCertCard').classList.remove('hidden');
+  msgEl.innerHTML = `<div class="msg info">Certificate generated for ${emp.name} — ${EXAMS[examKey].label} at ${pct}%. ${pct<PASS_PCT ? 'Note: this score is below the '+PASS_PCT+'% certification threshold.' : ''}</div>`;
+  renderAdmin();
+}
+function syncAward(record){
+  if(!backendConfigured()) return;
+  fetch(CONFIG.WEBAPP_URL, {
+    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action:'submitAttempt', record })
+  }).catch(()=>{});
+}
+function downloadAdminCert(){
+  const c = document.getElementById('certCanvasAdmin');
+  const r = window.__lastAwardRecord;
+  const link = document.createElement('a');
+  link.download = 'NCCB_Certificate_'+(r?r.exam:'award')+'_'+(r?r.username:'')+'.png';
+  link.href = c.toDataURL('image/png');
+  link.click();
+}
+
+/* ---------------- EMAIL CERTIFICATE ---------------- */
+function toggleEmailBox(prefix){
+  const box = document.getElementById('emailBox-'+prefix);
+  box.classList.toggle('hidden');
+  document.getElementById('emailMsg-'+prefix).innerHTML = '';
+}
+function sendCertificateEmail(prefix){
+  const canvasId = prefix==='cert' ? 'certCanvas' : 'certCanvasAdmin';
+  const record = prefix==='cert' ? lastResult : window.__lastAwardRecord;
+  const to = document.getElementById('emailAddr-'+prefix).value.trim();
+  const msgEl = document.getElementById('emailMsg-'+prefix);
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to);
+  if(!emailOk){
+    msgEl.innerHTML = '<div class="msgline err">Enter a valid email address.</div>';
+    return;
+  }
+  if(!record){
+    msgEl.innerHTML = '<div class="msgline err">No certificate loaded to send.</div>';
+    return;
+  }
+  if(!backendConfigured()){
+    msgEl.innerHTML = '<div class="msgline err">Email requires the Google Sheets/Apps Script backend to be configured. CONFIG.WEBAPP_URL is currently: <code>'+escapeHtml(CONFIG.WEBAPP_URL)+'</code> — paste your real Web App URL in index.html and re-upload to Netlify. See SETUP.md.</div>';
+    return;
+  }
+  const c = document.getElementById(canvasId);
+  const imageBase64 = c.toDataURL('image/png').split(',')[1];
+  msgEl.innerHTML = '<div class="msgline">Sending…</div>';
+  fetch(CONFIG.WEBAPP_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({
+      action:'emailCertificate',
+      to,
+      name: record.name,
+      examLabel: EXAMS[record.exam] ? EXAMS[record.exam].label : record.exam,
+      pct: record.pct,
+      requestedBy: currentUser.name,
+      imageBase64
+    })
+  }).then(r=>r.json()).then(res=>{
+    if(res && res.ok){
+      msgEl.innerHTML = '<div class="msgline ok">Certificate emailed to '+to+'.</div>';
+    } else {
+      msgEl.innerHTML = '<div class="msgline err">Could not send — '+(res && res.error ? res.error : 'unknown error')+'.</div>';
+    }
+  }).catch(()=>{
+    msgEl.innerHTML = '<div class="msgline err">Could not reach the backend to send the email.</div>';
+  });
+}
+</script>
+</body>
+</html>
